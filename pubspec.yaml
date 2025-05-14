@@ -11,10 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  flutter_svg: ^1.0.0 # Add flutter_svg for working with SVG images\
-  
-dependencies:
-  http: ^0.13.6
+  flutter_svg: ^1.0.0  # Add flutter_svg for working with SVG images
+  http: ^0.13.6         # Moved from duplicate section
 
 dev_dependencies:
   flutter_test:
@@ -22,10 +20,16 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
-  assets:
-    - assets/images/ # Ensure that images are in the assets/images directory
-
   uses-material-design: true
+  assets:
+    - assets/Icon.PNG
+    - assets/facebook_logo.PNG
+    - assets/google_logo.PNG 
+    - assets/bike1.PNG
+    - assets/bike2.PNG 
+    - assets/bike3.PNG
+    - assets/bike4.PNG
+    - assets/bike5.PNG  # Ensure that images are in the assets directory
 
   # To add custom fonts to your application, uncomment and add the necessary font configuration here.
   # fonts:

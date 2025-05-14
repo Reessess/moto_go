@@ -5,7 +5,7 @@ import 'EmailInputScreen.dart';
 class Verification1Widget extends StatelessWidget {
   final TextEditingController phoneController = TextEditingController();
 
-  Verification1Widget({Key? key}) : super(key: key);
+  Verification1Widget({super.key});
 
   @override
   Widget build(BuildContext context) {

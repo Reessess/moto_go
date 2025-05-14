@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'verification_screen.dart';
 
 class RegistrationWidget extends StatefulWidget {
-  const RegistrationWidget({Key? key}) : super(key: key);
+  const RegistrationWidget({super.key});
 
   @override
   State<RegistrationWidget> createState() => _RegistrationWidgetState();
