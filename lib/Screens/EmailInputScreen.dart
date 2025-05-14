@@ -1,93 +1,34 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';  // Make sure to import your login screen
+import 'login_screen.dart';  // Import your LoginScreen file
 
-class OtpInputScreen extends StatefulWidget {
+class EmailInputScreen extends StatefulWidget {
   final String phoneNumber;
 
-  const OtpInputScreen({super.key, required this.phoneNumber});
+  const EmailInputScreen({super.key, required this.phoneNumber});
 
   @override
-  State<OtpInputScreen> createState() => _OtpInputScreenState();
+  _EmailInputScreenState createState() => _EmailInputScreenState();
 }
 
-class _OtpInputScreenState extends State<OtpInputScreen> {
-  final TextEditingController otpController = TextEditingController();
-  int _remainingTime = 60; // 1 minute countdown
-  final bool _isOtpValid = false;
-  bool _isResendEnabled = false; // Initially disabled
+class _EmailInputScreenState extends State<EmailInputScreen> {
+  final TextEditingController emailController = TextEditingController();
+  bool isEmailSent = false;  // Track whether the email is sent
 
-  @override
-  void initState() {
-    super.initState();
-    _startCountdown();
+  bool _isValidEmail(String email) {
+    // Basic regex for email validation
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
   }
 
-  // Countdown timer logic
-  void _startCountdown() {
-    Future.delayed(const Duration(seconds: 1), () {
-      if (_remainingTime > 0) {
-        setState(() {
-          _remainingTime--;
-          _isResendEnabled = false;
-        });
-        _startCountdown(); // Recurse to update every second
-      } else {
-        setState(() {
-          _isResendEnabled = true;
-        });
-      }
-    });
-  }
-
-  // Simulated function to resend OTP
-  void resendOTP() {
+  // Function to simulate sending an email verification link
+  Future<void> _sendVerificationEmail() async {
+    // You can replace this with actual email sending logic
     setState(() {
-      _remainingTime = 60; // Reset the timer to 1 minute
-      _isResendEnabled = false; // Disable the button again
+      isEmailSent = true;
     });
-    _startCountdown(); // Restart the countdown
-    // Here, you can make an API call to resend the OTP
+    await Future.delayed(const Duration(seconds: 2));  // Simulate network delay
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('OTP Resent! Please check your phone.')),
-    );
-  }
-
-  void validateAndSubmitOtp() {
-    final otp = otpController.text.trim();
-    final isOtpValid = RegExp(r'^\d{6}$').hasMatch(otp);
-
-    if (!isOtpValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid 6-digit OTP')),
-      );
-      return;
-    }
-
-    // Proceed with OTP verification
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('OTP Submitted')),
-    );
-
-    // Show dialog with option to go to login screen after verification
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('OTP Verified'),
-          content: const Text('Your OTP has been successfully verified.'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),  // Navigate to LoginScreen
-                );
-              },
-              child: const Text('Go to Login'),
-            ),
-          ],
-        );
-      },
+      const SnackBar(content: Text('Verification email sent!')),
     );
   }
 
@@ -96,7 +37,7 @@ class _OtpInputScreenState extends State<OtpInputScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Abstract shapes
+          // Abstract rectangle shapes (same as before)
           Positioned(
             top: -60,
             left: -40,
@@ -166,7 +107,7 @@ class _OtpInputScreenState extends State<OtpInputScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'OTP Verification',
+                    'Email Verification',
                     style: TextStyle(
                       fontSize: 32,
                       fontFamily: 'Inter',
@@ -176,7 +117,7 @@ class _OtpInputScreenState extends State<OtpInputScreen> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    'We have sent a one-time password to:',
+                    'We have already sent the verification link to your email:',
                     style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Inter',
@@ -195,12 +136,10 @@ class _OtpInputScreenState extends State<OtpInputScreen> {
                   ),
                   const SizedBox(height: 40),
                   TextField(
-                    controller: otpController,
-                    keyboardType: TextInputType.number,
-                    maxLength: 6,
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      counterText: '',
-                      labelText: 'Enter OTP',
+                      labelText: 'Enter Email',
                       labelStyle: const TextStyle(color: Color(0xFFBF6A20)),
                       focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Color(0xFFBF6A20), width: 2),
@@ -223,9 +162,40 @@ class _OtpInputScreenState extends State<OtpInputScreen> {
                         color: const Color(0xFF1D2C69),
                       ),
                       child: TextButton(
-                        onPressed: validateAndSubmitOtp,
+                        onPressed: () {
+                          final email = emailController.text.trim();
+                          if (_isValidEmail(email)) {
+                            // Trigger email verification
+                            _sendVerificationEmail();
+                            // Show dialog after email verification
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Email Verification'),
+                                  content: const Text('A verification link has been sent to your email.'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                                        );
+                                      },
+                                      child: const Text('Go to Login'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please enter a valid email address')),
+                            );
+                          }
+                        },
                         child: const Text(
-                          'Verify',
+                          'Verify Email',
                           style: TextStyle(
                             fontSize: 28,
                             fontFamily: 'Inter',
@@ -238,12 +208,19 @@ class _OtpInputScreenState extends State<OtpInputScreen> {
                   const SizedBox(height: 20),
                   Center(
                     child: TextButton(
-                      onPressed: _isResendEnabled ? resendOTP : null,  // Enable only when countdown ends
-                      child: Text(
-                        _isResendEnabled
-                            ? 'Resend OTP'
-                            : 'Wait for ${_remainingTime}s',
-                        style: const TextStyle(
+                      onPressed: () {
+                        // Resend the verification email logic
+                        if (!isEmailSent) {
+                          _sendVerificationEmail();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('You have already received the verification email')),
+                          );
+                        }
+                      },
+                      child: const Text(
+                        'Resend Email',
+                        style: TextStyle(
                           color: Color(0xFFBF6A20),
                           fontSize: 16,
                           fontFamily: 'Inter',
