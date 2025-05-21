@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'home_screen.dart';
 
 class AdminLoginScreen extends StatelessWidget {
@@ -6,6 +9,58 @@ class AdminLoginScreen extends StatelessWidget {
   final TextEditingController passwordController = TextEditingController();
 
   AdminLoginScreen({super.key});
+
+  Future<void> _login(BuildContext context) async {
+    final String username = usernameController.text.trim();
+    final String password = passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      _showErrorDialog(context, 'Please enter both username and password.');
+      return;
+    }
+
+    final url = Uri.parse('http://192.168.5.129:3000/api/auth/admin-login'); // Replace with real IP if physical device
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+        }),
+      );
+
+      final result = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && result['success'] == true) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Homescreen()),
+        );
+      } else {
+        _showErrorDialog(context, result['message'] ?? 'Login failed');
+      }
+    } catch (e) {
+      _showErrorDialog(context, 'Error: $e');
+    }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Login Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,14 +170,7 @@ class AdminLoginScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Homescreen(),
-                          ),
-                        );
-                      },
+                      onPressed: () => _login(context),
                       child: const Text(
                         'Login',
                         style: TextStyle(fontSize: 18),
