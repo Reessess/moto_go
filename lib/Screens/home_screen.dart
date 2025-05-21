@@ -1,265 +1,192 @@
 import 'package:flutter/material.dart';
+import 'package:moto_go/Transaction/booking_screen.dart';
+import 'package:moto_go/Menu/setting_screen.dart';  // <--- Added this import for Settings screen navigation
+
+final List<Map<String, dynamic>> bikeList = [
+  {'image': 'assets/bike1.PNG', 'label': 'Yamaha R15', 'price': 280},
+  {'image': 'assets/bike2.PNG', 'label': 'KTM Duke 200', 'price': 240},
+  {'image': 'assets/bike3.PNG', 'label': 'Suzuki Raider', 'price': 150},
+  {'image': 'assets/bike4.PNG', 'label': 'Honda CBR', 'price': 300},
+  {'image': 'assets/bike5.PNG', 'label': 'Kawasaki Z400', 'price': 190},
+];
 
 class Homescreen extends StatelessWidget {
   const Homescreen({super.key});
 
-  final List<Map<String, String>> products = const [
-    {'image': 'assets/bike1.PNG', 'label': 'Motorcycle 1'},
-    {'image': 'assets/bike2.PNG', 'label': 'Motorcycle 2'},
-    {'image': 'assets/bike3.PNG', 'label': 'Motorcycle 3'},
-    {'image': 'assets/bike4.PNG', 'label': 'Motorcycle 4'},
-  ];
+  // Helper method to wrap menu ListTile in styled container
+  Widget _buildMenuTile({required Widget child}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),  // square curve corners
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Moto Go – Ride On!'),
-        backgroundColor: Colors.orange,
-        centerTitle: true,
-        elevation: 4,
-      ),
-      body: Stack(
-        children: [
-          // Background with colored squares
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _SquaresBackgroundPainter(),
-            ),
-          ),
-          // Your existing content
-          SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                Center(
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundImage: AssetImage('assets/Icon.PNG'),
-                  ),
+      drawer: SafeArea(
+        child: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              const DrawerHeader(
+                decoration: BoxDecoration(color: Colors.orange),
+                child: Text(
+                  'Menu',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search motorcycle, helmet, etc.',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                  ),
+              ),
+              _buildMenuTile(
+                child: ListTile(
+                  leading: const Icon(Icons.home),
+                  title: const Text('Home'),
+                  onTap: () => Navigator.pop(context),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildFilterButton('Favorite'),
-                    _buildFilterButton('Recommended'),
-                    _buildFilterButton('Promo'),
-                  ],
+              ),
+              _buildMenuTile(
+                child: ListTile(
+                  leading: const Icon(Icons.person),
+                  title: const Text('Profile'),
+                  onTap: () => Navigator.pop(context),
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  'Motorcycles',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+              ),
+              _buildMenuTile(
+                child: ListTile(
+                  leading: const Icon(Icons.history),
+                  title: const Text('Ride History'),
+                  onTap: () => Navigator.pop(context),
                 ),
-                const SizedBox(height: 12),
-                _buildProductGrid(context),
-                const SizedBox(height: 20),
-                Text(
-                  'Featured Product',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+              ),
+              _buildMenuTile(
+                child: ListTile(
+                  leading: const Icon(Icons.payment),
+                  title: const Text('Payment Methods'),
+                  onTap: () => Navigator.pop(context),
                 ),
-                const SizedBox(height: 12),
-                _buildSingleProductCard(
-                  imagePath: 'assets/bike5.PNG',
-                  title: 'Motorcycle 5',
-                  subtitle: 'Scooter, bike',
-                  price: 'P300/Hour',
+              ),
+              _buildMenuTile(
+                child: ListTile(
+                  leading: const Icon(Icons.book),
+                  title: const Text('My Bookings'),
+                  onTap: () => Navigator.pop(context),
+                ),
+              ),
+              _buildMenuTile(
+                child: ListTile(
+                  leading: const Icon(Icons.settings),
+                  title: const Text('Settings'),
                   onTap: () {
+                    Navigator.pop(context); // Close the drawer first
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const DetailScreen(title: 'Motorcycle 5'),
-                      ),
+                      MaterialPageRoute(builder: (_) => const SettingScreen()),
                     );
                   },
                 ),
-                const SizedBox(height: 20),
-              ],
-            ),
+              ),
+              _buildMenuTile(
+                child: ListTile(
+                  leading: const Icon(Icons.logout, color: Colors.orange),
+                  title: const Text('Logout', style: TextStyle(color: Colors.orange)),
+                  onTap: () => Navigator.pop(context),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view),
-            label: 'Categories',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Cart',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterButton(String label) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.orange.shade700,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          onPressed: () {},
-          child: Text(label, textAlign: TextAlign.center),
         ),
       ),
-    );
-  }
-
-  Widget _buildProductGrid(BuildContext context) {
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: products.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisExtent: 220,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-      ),
-      itemBuilder: (context, index) {
-        final product = products[index];
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => DetailScreen(title: product['label'] ?? 'Product'),
-              ),
-            );
-          },
-          child: Card(
-            elevation: 3,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Image.asset(
-                    product['image']!,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      product['label']!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildSingleProductCard({
-    required String imagePath,
-    required String title,
-    required String subtitle,
-    required String price,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  imagePath,
-                  height: 140,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Builder(
+                      builder: (context) => IconButton(
+                        icon: const Icon(Icons.menu, color: Colors.black, size: 28),
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search, color: Colors.black, size: 28),
+                      onPressed: () {
+                        showSearch(
+                          context: context,
+                          delegate: BikeSearchDelegate(bikeList),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'Pick Your Bike',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'nunito',
+                    color: Colors.black,
+                  ),
                 ),
               ),
-              Text(
-                subtitle,
-                style: const TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                price,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 25),
+              SizedBox(
+                height: height * 0.5,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  itemCount: bikeList.length,
+                  padding: const EdgeInsets.only(left: 16),
+                  itemBuilder: (context, index) {
+                    final bike = bikeList[index];
+                    return _buildBikeCard(context, bike, key: ValueKey(bike['label']));
+                  },
                 ),
               ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              const SizedBox(height: 30),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'Top Picks ⭐',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'nunito',
+                  ),
                 ),
-                onPressed: () {},
-                child: const Text('Rent Now'),
+              ),
+              const SizedBox(height: 16),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: bikeList.length,
+                itemBuilder: (context, index) {
+                  final bike = bikeList[index];
+                  return _buildTopPickCard(context, bike, key: ValueKey('top_${bike['label']}'));
+                },
               ),
             ],
           ),
@@ -267,55 +194,242 @@ class Homescreen extends StatelessWidget {
       ),
     );
   }
-}
 
-class DetailScreen extends StatelessWidget {
-  final String title;
-  const DetailScreen({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: Colors.orange,
+  Widget _buildBikeCard(BuildContext context, Map<String, dynamic> bike, {Key? key}) {
+    return Container(
+      key: key,
+      width: 250,
+      margin: const EdgeInsets.only(right: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.grey[100],
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(2, 4)),
+        ],
       ),
-      body: Center(
-        child: Text(
-          'Details for $title coming soon!',
-          style: const TextStyle(fontSize: 22),
-          textAlign: TextAlign.center,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            Image.asset(
+              bike['image'],
+              height: double.infinity,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            Positioned(
+              top: 12,
+              left: 12,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  bike['label'],
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'nunito',
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 20,
+              left: 16,
+              right: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '₱${bike['price']}/Hour',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => BookingScreen(bike: bike)),
+                      );
+                    },
+                    child: const Text('Rent Now'),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTopPickCard(BuildContext context, Map<String, dynamic> bike, {Key? key}) {
+    return Container(
+      key: key,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(2, 2)),
+        ],
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              bike['image'],
+              width: 100,
+              height: 80,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  bike['label'],
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'nunito',
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '₱${bike['price']}/Hour',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Fast, Reliable, Affordable',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => BookingScreen(bike: bike)),
+              );
+            },
+            child: const Text('Book'),
+          ),
+        ],
       ),
     );
   }
 }
 
-// New CustomPainter class for colored square background
-class _SquaresBackgroundPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    final squareSize = 40.0;
-    final colors = [
-      Colors.orange.shade100,
-      Colors.orange.shade200,
-      Colors.orange.shade300,
-      Colors.orange.shade400,
-    ];
+// --- Search Delegate Class ---
+class BikeSearchDelegate extends SearchDelegate {
+  final List<Map<String, dynamic>> bikeList;
 
-    int colorIndex = 0;
-    for (double y = 0; y < size.height; y += squareSize) {
-      for (double x = 0; x < size.width; x += squareSize) {
-        paint.color = colors[colorIndex % colors.length];
-        canvas.drawRect(Rect.fromLTWH(x, y, squareSize, squareSize), paint);
-        colorIndex++;
-      }
-      // Offset for alternating pattern effect
-      colorIndex++;
-    }
+  BikeSearchDelegate(this.bikeList);
+
+  @override
+  String get searchFieldLabel => 'Search bikes...';
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      if (query.isNotEmpty)
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () => query = '',
+        ),
+    ];
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => close(context, null),
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    final results = bikeList.where((bike) {
+      final label = bike['label'].toString().toLowerCase();
+      final q = query.toLowerCase();
+      return label.contains(q);
+    }).toList();
+
+    if (results.isEmpty) {
+      return const Center(child: Text('No bikes found.'));
+    }
+
+    return ListView.builder(
+      itemCount: results.length,
+      itemBuilder: (_, index) {
+        final bike = results[index];
+        return ListTile(
+          title: Text(bike['label']),
+          subtitle: Text('₱${bike['price']}/Hour'),
+          leading: Image.asset(bike['image'], width: 50, fit: BoxFit.cover),
+          onTap: () {
+            close(context, null);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => BookingScreen(bike: bike)),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestions = bikeList.where((bike) {
+      final label = bike['label'].toString().toLowerCase();
+      final q = query.toLowerCase();
+      return label.contains(q);
+    }).toList();
+
+    return ListView.builder(
+      itemCount: suggestions.length,
+      itemBuilder: (_, index) {
+        final bike = suggestions[index];
+        return ListTile(
+          title: Text(bike['label']),
+          leading: Image.asset(bike['image'], width: 50, fit: BoxFit.cover),
+          onTap: () {
+            query = bike['label'];
+            showResults(context);
+          },
+        );
+      },
+    );
+  }
 }

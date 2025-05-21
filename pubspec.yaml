@@ -13,7 +13,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^1.0.0  # Add flutter_svg for working with SVG images
   http: ^0.13.6         # Moved from duplicate section
-
+  intl: ^0.20.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -29,7 +29,12 @@ flutter:
     - assets/bike2.PNG 
     - assets/bike3.PNG
     - assets/bike4.PNG
-    - assets/bike5.PNG  # Ensure that images are in the assets directory
+    - assets/bike5.PNG
+    - assets/gcash.PNG
+    - assets/paymaya.PNG
+    - assets/bank.PNG # Ensure that images are in the assets directory
+Username: admin
+Password: 1234
 
   # To add custom fonts to your application, uncomment and add the necessary font configuration here.
   # fonts:

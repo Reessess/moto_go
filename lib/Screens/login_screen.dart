@@ -1,13 +1,83 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'registration_screen.dart';
-import 'home_screen.dart'; // Import for Homescreen
-import 'admin_login_screen.dart'; // Correct import
+import 'package:http/http.dart' as http;
 
-class LoginScreen extends StatelessWidget {
+import 'registration_screen.dart';
+import 'home_screen.dart';
+import 'admin_login_screen.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  LoginScreen({super.key});
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Login Failed'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _login() async {
+    final username = usernameController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      _showErrorDialog('Please enter both username and password.');
+      return;
+    }
+
+    final url = Uri.parse('http://192.168.5.129:3000/api/auth/login'); // Replace with your API URL
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        // Login success, navigate to home
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Homescreen()),
+        );
+      } else {
+        _showErrorDialog(data['message'] ?? 'Invalid username or password.');
+      }
+    } catch (e) {
+      _showErrorDialog('An error occurred. Please try again.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +126,7 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 40),
 
-                  // Admin Login Button (now correctly navigates to AdminLoginScreen)
+                  // Admin Login Button
                   Align(
                     alignment: Alignment.topRight,
                     child: ElevatedButton(
@@ -71,16 +141,13 @@ class LoginScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AdminLoginScreen(), // Navigate to AdminLoginScreen
+                            builder: (context) => AdminLoginScreen(),
                           ),
                         );
                       },
                       child: const Text(
                         'Admin Login',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.white),
                       ),
                     ),
                   ),
@@ -88,11 +155,9 @@ class LoginScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // App icon
-                  Center(
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundImage: AssetImage('assets/Icon.PNG'),
-                    ),
+                  const CircleAvatar(
+                    radius: 60,
+                    backgroundImage: AssetImage('assets/Icon.PNG'),
                   ),
                   const SizedBox(height: 40),
 
@@ -150,6 +215,7 @@ class LoginScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+
                   const SizedBox(height: 40),
 
                   // Login Button
@@ -164,12 +230,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Homescreen(),
-                          ),
-                        );
+                        _login();
                       },
                       child: const Text(
                         'Login',
@@ -177,6 +238,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 20),
 
                   // Sign Up Button
@@ -194,7 +256,7 @@ class LoginScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => RegistrationWidget(),
+                            builder: (context) => const RegistrationWidget(),
                           ),
                         );
                       },
@@ -204,9 +266,9 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 30),
 
-                  // Social login text
                   const Text(
                     'Or login with',
                     style: TextStyle(
@@ -220,7 +282,6 @@ class LoginScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Google
                       SizedBox(
                         width: 30,
                         height: 30,
@@ -233,7 +294,6 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 20),
-                      // Facebook
                       SizedBox(
                         width: 30,
                         height: 30,
