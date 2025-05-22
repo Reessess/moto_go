@@ -11,6 +11,8 @@ router.post('/register', authController.register);
 // User login route
 router.post('/login', authController.userLogin);
 
+router.get('/login', authController.userLogin);
+
 router.get('/profile', authController.getUserProfile);
 
 // Add this line for profile update route

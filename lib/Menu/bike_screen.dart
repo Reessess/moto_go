@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:moto_go/providers/bike_provider.dart';
 
+
 class BikesScreen extends StatefulWidget {
   const BikesScreen({super.key});
 
@@ -12,18 +13,35 @@ class BikesScreen extends StatefulWidget {
 class _BikesScreenState extends State<BikesScreen> {
   String selectedBrand = '';
   double? maxPrice;
+  bool _isInit = true;
+  bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    Provider.of<BikeProvider>(context, listen: false).fetchBikes();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _isLoading = true;
+      Provider.of<BikeProvider>(context).fetchBikes().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+      _isInit = false;
+    }
   }
 
   void applyFilters() {
-    Provider.of<BikeProvider>(context, listen: false).fetchBikes(
-      brand: selectedBrand,
-      maxPrice: maxPrice,
-    );
+    setState(() {
+      _isLoading = true;
+    });
+
+    Provider.of<BikeProvider>(context, listen: false)
+        .fetchBikes(brand: selectedBrand, maxPricePerHour: maxPrice)
+        .then((_) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   @override
@@ -45,8 +63,10 @@ class _BikesScreenState extends State<BikesScreen> {
           )
         ],
       ),
-      body: bikes.isEmpty
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
+          : bikes.isEmpty
+          ? const Center(child: Text("No bikes found."))
           : ListView.builder(
         itemCount: bikes.length,
         itemBuilder: (context, index) {
@@ -54,9 +74,15 @@ class _BikesScreenState extends State<BikesScreen> {
           return Card(
             margin: const EdgeInsets.all(8),
             child: ListTile(
-              leading: Image.network(bike.imageUrl, width: 60, height: 60, fit: BoxFit.cover),
+              leading: Image.network(
+                bike.imageUrl,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+              ),
               title: Text('${bike.brand} ${bike.model}'),
-              subtitle: Text('₱${bike.pricePerDay}/day\n${bike.status}'),
+              subtitle:
+              Text('₱${bike.pricePerHour}/day\n${bike.status}'),
               isThreeLine: true,
             ),
           );
@@ -84,6 +110,7 @@ class _BikesScreenState extends State<BikesScreen> {
               maxPrice = double.tryParse(value);
             },
           ),
+          const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);

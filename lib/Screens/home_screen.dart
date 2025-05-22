@@ -1,12 +1,9 @@
-// Full Homescreen code with MyBooking moved to Drawer menu
 import 'package:flutter/material.dart';
 import 'package:moto_go/Menu/setting_screen.dart';
 import 'package:moto_go/Menu/profile_screen.dart';
-import 'package:moto_go/Menu/my_bookings.dart';
 import 'package:moto_go/Transaction/booking_transaction.dart';
 import 'package:moto_go/Transaction/my_bookings_screen.dart';
-
-
+import 'package:moto_go/Menu/bike_screen.dart'; // <-- Make sure this exists
 
 final List<Map<String, dynamic>> bikeList = [
   {'image': 'assets/bike1.PNG', 'label': 'Yamaha R15', 'price': 280},
@@ -122,6 +119,17 @@ class _HomescreenState extends State<Homescreen> {
               ),
               _buildMenuTile(
                 child: ListTile(
+                  leading: const Icon(Icons.motorcycle),
+                  title: const Text('Bikes'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const BikesScreen()));
+                  },
+                ),
+              ),
+              _buildMenuTile(
+                child: ListTile(
                   leading: const Icon(Icons.settings),
                   title: const Text('Settings'),
                   onTap: () {
@@ -135,9 +143,10 @@ class _HomescreenState extends State<Homescreen> {
                 child: ListTile(
                   leading: const Icon(Icons.book_online),
                   title: const Text('My Bookings'),
-                  onTap: () {Navigator.pop(context);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const MyBookingsScreen()));// Close drawer
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const MyBookingsScreen()));
                   },
                 ),
               ),
@@ -377,8 +386,8 @@ class _HomescreenState extends State<Homescreen> {
           ),
           title: Text(
             bike['label'],
-            style:
-            const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'nunito'),
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, fontFamily: 'nunito'),
           ),
           subtitle: Text('${bike['price']} / Hour',
               style: const TextStyle(color: Colors.orange)),
@@ -436,6 +445,7 @@ class BikeSearchDelegate extends SearchDelegate<String> {
       itemBuilder: (context, index) {
         final bike = results[index];
         return ListTile(
+          leading: Image.asset(bike['image'], width: 60),
           title: Text(bike['label']),
           subtitle: Text('${bike['price']} / Hour'),
           onTap: () {

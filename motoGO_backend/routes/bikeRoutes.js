@@ -1,8 +1,8 @@
 const express = require('express');
-const { getBikes } = require('../controllers/bikeController');
+const bikeController = require('../controllers/bikeController'); // <-- make sure this line is here
 const router = express.Router();
 
-router.get('/', getBikes);
-
+router.get('/', bikeController.getBikes);
+router.post('/', bikeController.addBikes);
 
 module.exports = router;
