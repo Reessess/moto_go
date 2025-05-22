@@ -18,5 +18,4 @@ router.put('/profile/update', authController.updateProfile);
 
 
 
-
 module.exports = router;

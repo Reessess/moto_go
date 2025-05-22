@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:moto_go/providers/user_provider.dart';
+import 'package:moto_go/providers/user_provider.dart'; // <-- Import PaymentProvider
 import 'Screens/login_screen.dart';
+import 'package:moto_go/providers/bike_provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => BikeProvider()),
       ],
       child: const MyApp(),
     ),

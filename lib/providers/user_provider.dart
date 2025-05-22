@@ -12,6 +12,8 @@ class UserProvider extends ChangeNotifier {
   String? get email => _userData?['email'];
   String? get phone => _userData?['phone'];
   String? get dob => _userData?['dob'];
+  String? get userId => _userData?['id']?.toString();
+
 
   void setUserData(Map<String, dynamic> data) {
     _userData = data;

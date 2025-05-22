@@ -243,3 +243,23 @@ exports.updateProfile = async (req, res) => {
     });
   }
 };
+exports.addBike = async (req, res) => {
+  const { model, brand, description, price_per_day, image_url } = req.body;
+
+  if (!model || !brand || !price_per_day) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    const sql = `
+      INSERT INTO bikes (model, brand, description, price_per_day, image_url)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    await db.query(sql, [model, brand, description, price_per_day, image_url]);
+
+    res.status(201).json({ message: 'Bike added successfully' });
+  } catch (error) {
+    console.error('Error adding bike:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

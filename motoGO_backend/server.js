@@ -2,12 +2,11 @@ const express = require('express');
 const dotenv = require('dotenv');
 const db = require('./models/db');
 const authRoutes = require('./routes/authRoutes');
+const bikeRoutes = require('./routes/bikeRoutes');
 const cors = require('cors');
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-
 
 app.use(cors());
 app.use(express.json());

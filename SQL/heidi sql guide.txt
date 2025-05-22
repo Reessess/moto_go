@@ -1,0 +1,35 @@
+id
+first_name
+middle_name
+last_name
+username
+email
+phone
+dob
+password
+
+CREATE TABLE bikes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  model VARCHAR(100),
+  brand VARCHAR(100),
+  description TEXT,
+  price_per_day DECIMAL(10, 2),
+  image_url TEXT,
+  status VARCHAR(50) DEFAULT 'available'
+);
+
+
+sql
+CREATE USER 'motogo'@'localhost' IDENTIFIED BY '1234';
+
+GRANT ALL PRIVILEGES ON motogo_db.* TO 'motogo'@'localhost';
+
+FLUSH PRIVILEGES;
+
+nodes run
+npm install -y
+npm install -g nodemon
+nodeman server.js
+node server.js
+
+Full code fix please should be provided while the others is preserved
