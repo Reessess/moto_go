@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  provider: ^6.1.1
   flutter_svg: ^1.0.0  # Add flutter_svg for working with SVG images
   http: ^0.13.6         # Moved from duplicate section
   intl: ^0.20.2

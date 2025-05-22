@@ -111,7 +111,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                 width: 600,
                 height: 500,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF691D1D),
+                  color: const Color(0xFF96D13A),
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),

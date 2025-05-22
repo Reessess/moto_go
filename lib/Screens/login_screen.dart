@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
-import 'registration_screen.dart';
+import 'package:moto_go/providers/user_provider.dart';
 import 'home_screen.dart';
 import 'admin_login_screen.dart';
+import 'registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -51,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final url = Uri.parse('http://192.168.5.129:3000/api/auth/login'); // Replace with your API URL
+    final url = Uri.parse('http://192.168.5.129:3000/api/auth/login');
 
     try {
       final response = await http.post(
@@ -66,6 +68,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data['success'] == true) {
+        // Set username in provider
+        Provider.of<UserProvider>(context, listen: false).setUsername(username);
+
         // Login success, navigate to home
         Navigator.pushReplacement(
           context,
@@ -85,7 +90,6 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background shapes
           Positioned(
             top: -120,
             left: -100,
@@ -117,7 +121,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Content
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
@@ -125,8 +128,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-
-                  // Admin Login Button
                   Align(
                     alignment: Alignment.topRight,
                     child: ElevatedButton(
@@ -151,17 +152,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // App icon
                   const CircleAvatar(
                     radius: 60,
                     backgroundImage: AssetImage('assets/Icon.PNG'),
                   ),
                   const SizedBox(height: 40),
-
-                  // Title
                   const Text(
                     'Login',
                     style: TextStyle(
@@ -171,8 +167,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
-
-                  // Login form
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -202,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              // Handle forgot password
+                              // Forgot password handler
                             },
                             child: const Text(
                               'Forgot password?',
@@ -215,10 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 40),
-
-                  // Login Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -229,19 +220,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      onPressed: () {
-                        _login();
-                      },
+                      onPressed: _login,
                       child: const Text(
                         'Login',
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Sign Up Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -266,9 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   const Text(
                     'Or login with',
                     style: TextStyle(
@@ -277,8 +261,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Social Login Buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

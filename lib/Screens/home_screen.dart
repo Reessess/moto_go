@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:moto_go/Transaction/booking_screen.dart';
-import 'package:moto_go/Menu/setting_screen.dart';  // <--- Added this import for Settings screen navigation
+import 'package:moto_go/Menu/setting_screen.dart';
+import 'package:moto_go/Menu/profile_screen.dart';
+import 'package:moto_go/Menu/my_bookings.dart';
 
 final List<Map<String, dynamic>> bikeList = [
   {'image': 'assets/bike1.PNG', 'label': 'Yamaha R15', 'price': 280},
@@ -13,13 +15,12 @@ final List<Map<String, dynamic>> bikeList = [
 class Homescreen extends StatelessWidget {
   const Homescreen({super.key});
 
-  // Helper method to wrap menu ListTile in styled container
   Widget _buildMenuTile({required Widget child}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),  // square curve corners
+        borderRadius: BorderRadius.circular(8),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -42,46 +43,97 @@ class Homescreen extends StatelessWidget {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.orange),
-                child: Text(
-                  'Menu',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: const BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/Icon.PNG',  // your image path here
+                      height: 60,
+                      // optional: width: 60,
+                      // optional: fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Welcome to',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Text(
+                      'MotoGO',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'nunito',
+                      ),
+                    ),
+                  ],
                 ),
               ),
               _buildMenuTile(
                 child: ListTile(
                   leading: const Icon(Icons.home),
                   title: const Text('Home'),
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
                 ),
               ),
               _buildMenuTile(
                 child: ListTile(
                   leading: const Icon(Icons.person),
                   title: const Text('Profile'),
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                    );
+                  },
                 ),
               ),
               _buildMenuTile(
                 child: ListTile(
                   leading: const Icon(Icons.history),
                   title: const Text('Ride History'),
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to Ride History screen
+                  },
                 ),
               ),
               _buildMenuTile(
                 child: ListTile(
                   leading: const Icon(Icons.payment),
                   title: const Text('Payment Methods'),
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to Payment Methods screen
+                  },
                 ),
               ),
               _buildMenuTile(
                 child: ListTile(
                   leading: const Icon(Icons.book),
                   title: const Text('My Bookings'),
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MyBooking()),
+                    );
+                  },
                 ),
               ),
               _buildMenuTile(
@@ -89,7 +141,7 @@ class Homescreen extends StatelessWidget {
                   leading: const Icon(Icons.settings),
                   title: const Text('Settings'),
                   onTap: () {
-                    Navigator.pop(context); // Close the drawer first
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const SettingScreen()),
@@ -101,7 +153,10 @@ class Homescreen extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.logout, color: Colors.orange),
                   title: const Text('Logout', style: TextStyle(color: Colors.orange)),
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Implement logout functionality
+                  },
                 ),
               ),
             ],
@@ -292,15 +347,15 @@ class Homescreen extends StatelessWidget {
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
             child: Image.asset(
               bike['image'],
-              width: 100,
               height: 80,
+              width: 80,
               fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,19 +368,12 @@ class Homescreen extends StatelessWidget {
                     fontFamily: 'nunito',
                   ),
                 ),
-                const SizedBox(height: 6),
                 Text(
                   '₱${bike['price']}/Hour',
                   style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.grey,
                   ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Fast, Reliable, Affordable',
-                  style: TextStyle(color: Colors.grey),
                 ),
               ],
             ),
@@ -333,7 +381,7 @@ class Homescreen extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () {
               Navigator.push(
@@ -341,7 +389,7 @@ class Homescreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => BookingScreen(bike: bike)),
               );
             },
-            child: const Text('Book'),
+            child: const Text('Rent Now'),
           ),
         ],
       ),
@@ -349,14 +397,13 @@ class Homescreen extends StatelessWidget {
   }
 }
 
-// --- Search Delegate Class ---
-class BikeSearchDelegate extends SearchDelegate {
-  final List<Map<String, dynamic>> bikeList;
+class BikeSearchDelegate extends SearchDelegate<Map<String, dynamic>> {
+  final List<Map<String, dynamic>> bikes;
 
-  BikeSearchDelegate(this.bikeList);
+  BikeSearchDelegate(this.bikes);
 
   @override
-  String get searchFieldLabel => 'Search bikes...';
+  String get searchFieldLabel => 'Search bikes';
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -364,7 +411,9 @@ class BikeSearchDelegate extends SearchDelegate {
       if (query.isNotEmpty)
         IconButton(
           icon: const Icon(Icons.clear),
-          onPressed: () => query = '',
+          onPressed: () {
+            query = '';
+          },
         ),
     ];
   }
@@ -373,63 +422,48 @@ class BikeSearchDelegate extends SearchDelegate {
   Widget? buildLeading(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
-      onPressed: () => close(context, null),
+      onPressed: () {
+        close(context, {});
+      },
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    final results = bikeList.where((bike) {
-      final label = bike['label'].toString().toLowerCase();
-      final q = query.toLowerCase();
-      return label.contains(q);
-    }).toList();
+    final results = bikes.where((bike) =>
+        bike['label'].toString().toLowerCase().contains(query.toLowerCase()));
 
-    if (results.isEmpty) {
-      return const Center(child: Text('No bikes found.'));
-    }
-
-    return ListView.builder(
-      itemCount: results.length,
-      itemBuilder: (_, index) {
-        final bike = results[index];
+    return ListView(
+      children: results.map((bike) {
         return ListTile(
+          leading: Image.asset(bike['image'], width: 50),
           title: Text(bike['label']),
           subtitle: Text('₱${bike['price']}/Hour'),
-          leading: Image.asset(bike['image'], width: 50, fit: BoxFit.cover),
           onTap: () {
-            close(context, null);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => BookingScreen(bike: bike)),
-            );
+            close(context, bike);
           },
         );
-      },
+      }).toList(),
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final suggestions = bikeList.where((bike) {
-      final label = bike['label'].toString().toLowerCase();
-      final q = query.toLowerCase();
-      return label.contains(q);
-    }).toList();
+    final suggestions = bikes.where((bike) =>
+        bike['label'].toString().toLowerCase().contains(query.toLowerCase()));
 
-    return ListView.builder(
-      itemCount: suggestions.length,
-      itemBuilder: (_, index) {
-        final bike = suggestions[index];
+    return ListView(
+      children: suggestions.map((bike) {
         return ListTile(
+          leading: Image.asset(bike['image'], width: 50),
           title: Text(bike['label']),
-          leading: Image.asset(bike['image'], width: 50, fit: BoxFit.cover),
+          subtitle: Text('₱${bike['price']}/Hour'),
           onTap: () {
             query = bike['label'];
             showResults(context);
           },
         );
-      },
+      }).toList(),
     );
   }
 }

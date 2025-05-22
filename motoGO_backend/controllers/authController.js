@@ -1,10 +1,9 @@
-const db = require('../models/db');
+const db = require('../models/db'); // your db connection (promise-based)
 const bcrypt = require('bcryptjs');
 
 // Admin Login Handler
 exports.adminLogin = async (req, res) => {
   const { username, password } = req.body;
-
   if (!username || !password) {
     return res.status(400).json({
       success: false,
@@ -13,28 +12,17 @@ exports.adminLogin = async (req, res) => {
   }
 
   try {
-    // Query admin user by username
     const [rows] = await db.query('SELECT * FROM admin_users WHERE username = ?', [username]);
-
-    if (!rows || rows.length === 0) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid username or password',
-      });
+    if (!rows.length) {
+      return res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
 
     const admin = rows[0];
-
-    // Compare password using bcrypt
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid username or password',
-      });
+      return res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
 
-    // Login successful
     return res.status(200).json({
       success: true,
       message: 'Login successful',
@@ -46,25 +34,13 @@ exports.adminLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Admin login error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-    });
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
 // User Registration Handler
 exports.register = async (req, res) => {
-  const {
-    first_name,
-    middle_name,
-    last_name,
-    username,
-    email,
-    phone,
-    dob,
-    password,
-  } = req.body;
+  const { first_name, middle_name, last_name, username, email, phone, dob, password } = req.body;
 
   if (!first_name || !last_name || !username || !email || !password) {
     return res.status(400).json({
@@ -117,7 +93,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// User Login Handler (added)
+// User Login Handler
 exports.userLogin = async (req, res) => {
   const { username, password } = req.body;
 
@@ -129,10 +105,9 @@ exports.userLogin = async (req, res) => {
   }
 
   try {
-    // Query user by username
     const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
 
-    if (!rows || rows.length === 0) {
+    if (!rows.length) {
       return res.status(401).json({
         success: false,
         message: 'Invalid username or password',
@@ -140,9 +115,8 @@ exports.userLogin = async (req, res) => {
     }
 
     const user = rows[0];
-
-    // Compare password using bcrypt
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -150,7 +124,6 @@ exports.userLogin = async (req, res) => {
       });
     }
 
-    // Login successful
     return res.status(200).json({
       success: true,
       message: 'Login successful',
@@ -165,6 +138,108 @@ exports.userLogin = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
+    });
+  }
+};
+
+// Get User Profile Handler
+exports.getUserProfile = async (req, res) => {
+  // I recommend using req.params or req.query based on your routing
+  const username = req.query.username || req.params.username;
+
+  if (!username) {
+    return res.status(400).json({
+      success: false,
+      message: 'Username is required',
+    });
+  }
+
+  try {
+    const [rows] = await db.query(
+      `SELECT first_name, middle_name, last_name, username, email, phone, dob
+       FROM users
+       WHERE username = ?`,
+      [username]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: rows[0],
+    });
+  } catch (err) {
+    console.error('Error fetching user profile:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
+  }
+};
+exports.updateProfile = async (req, res) => {
+  const { username, first_name, middle_name, last_name, email, phone, dob } = req.body;
+
+  if (!username) {
+    return res.status(400).json({
+      success: false,
+      message: 'Username is required',
+    });
+  }
+
+  try {
+    // Optional: Check if user exists first (not mandatory)
+    const [existingUser] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+    if (existingUser.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const sql = `
+      UPDATE users SET
+        first_name = ?,
+        middle_name = ?,
+        last_name = ?,
+        email = ?,
+        phone = ?,
+        dob = ?
+      WHERE username = ?
+    `;
+
+    const params = [
+      first_name || null,
+      middle_name || null,
+      last_name || null,
+      email || null,
+      phone || null,
+      dob || null,
+      username,
+    ];
+
+    const [result] = await db.query(sql, params);
+
+    if (result.affectedRows === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Update failed',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while updating profile',
     });
   }
 };
