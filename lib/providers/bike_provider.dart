@@ -36,7 +36,6 @@ class BikeProvider with ChangeNotifier {
 
   List<Bike> get bikes => [..._bikes];
 
-  /// Fetch bikes from backend, optionally filter by brand, model, and max price per hour
   Future<void> fetchBikes({
     String? brand,
     String? model,
@@ -44,7 +43,6 @@ class BikeProvider with ChangeNotifier {
   }) async {
     final String baseUrl = 'http://192.168.5.129:3000/api/bikes';
 
-    // Prepare query parameters
     final Map<String, String> queryParams = {};
     if (brand != null && brand.isNotEmpty) {
       queryParams['brand'] = brand;
@@ -63,12 +61,10 @@ class BikeProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-
         _bikes = data.map((jsonBike) => Bike.fromJson(jsonBike)).toList();
         notifyListeners();
       } else {
         print('Failed to load bikes. Status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
         _bikes = [];
         notifyListeners();
       }
