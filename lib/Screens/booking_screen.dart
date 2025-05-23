@@ -3,10 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:moto_go/Model/bike.dart';
 
+import 'package:moto_go/Model/bike.dart';
 import 'package:moto_go/providers/user_provider.dart';
-import 'package:moto_go/providers/bike_provider.dart';
 
 class BookingScreen extends StatefulWidget {
   final Bikes selectedBike;
@@ -51,17 +50,26 @@ class _BookingScreenState extends State<BookingScreen> {
   Future<void> _submitBooking() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    // userId as int? converted from string stored in UserProvider
+    // Convert userId from String? to int?
     final String? userIdStr = userProvider.userId;
-    final int? userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+    final int? userId = int.tryParse(userProvider.userId ?? '');
 
-    final Bikes bike = widget.selectedBike;
-    final int? bikeId = int.tryParse(bike.id);
-    final double pricePerHour = bike.pricePerHour;
+    // Convert bike id safely
+    final dynamic bikeIdRaw = widget.selectedBike.id;
+    final int? bikeId = (bikeIdRaw is int)
+        ? bikeIdRaw
+        : (bikeIdRaw is String ? int.tryParse(bikeIdRaw) : null);
 
-    if (userId == null || bikeId == null) {
+    if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Missing user or bike data')),
+        const SnackBar(content: Text('User is not logged in')),
+      );
+      return;
+    }
+
+    if (bikeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid bike selected')),
       );
       return;
     }
@@ -74,7 +82,7 @@ class _BookingScreenState extends State<BookingScreen> {
       return;
     }
 
-    final double totalCost = hours * pricePerHour;
+    final double totalCost = hours * widget.selectedBike.pricePerHour;
 
     final bookingData = {
       "bike_id": bikeId,
@@ -123,6 +131,10 @@ class _BookingScreenState extends State<BookingScreen> {
     final bike = widget.selectedBike;
     final pricePerHour = bike.pricePerHour;
 
+    final userProvider = Provider.of<UserProvider>(context);
+    final userName = userProvider.username ?? 'Guest User';
+    final userEmail = userProvider.email ?? 'No Email';
+
     final String formattedDate = _pickupDateTime != null
         ? DateFormat('yyyy-MM-dd HH:mm').format(_pickupDateTime!)
         : 'Select pickup date & time';
@@ -130,12 +142,40 @@ class _BookingScreenState extends State<BookingScreen> {
     final int hours = int.tryParse(_hoursController.text) ?? 0;
     final double totalCost = hours * pricePerHour;
 
+    bool canSubmit = _pickupDateTime != null && hours > 0 && !_isSubmitting;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Book a Bike')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // User Info Display
+            Card(
+              elevation: 2,
+              margin: const EdgeInsets.only(bottom: 16),
+              child: ListTile(
+                leading: const Icon(Icons.person),
+                title:
+                Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(userEmail),
+              ),
+            ),
+
+            // Bike Info Display
+            Card(
+              elevation: 2,
+              margin: const EdgeInsets.only(bottom: 24),
+              child: ListTile(
+                leading: const Icon(Icons.directions_bike),
+                title: Text('${bike.brand} ${bike.model}',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text('Price per hour: ₱${pricePerHour.toStringAsFixed(2)}'),
+              ),
+            ),
+
+            // Booking controls
             ListTile(
               title: const Text('Pickup Date & Time'),
               subtitle: Text(formattedDate),
@@ -162,7 +202,7 @@ class _BookingScreenState extends State<BookingScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _isSubmitting ? null : _submitBooking,
+                onPressed: canSubmit ? _submitBooking : null,
                 child: _isSubmitting
                     ? const SizedBox(
                   height: 20,
