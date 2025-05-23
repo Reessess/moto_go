@@ -85,7 +85,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data['success'] == true) {
-        Provider.of<UserProvider>(context, listen: false).setUsername(username);
+        final user = data['user'];
+        Provider.of<UserProvider>(context, listen: false).setUserData(user);
 
         Navigator.pushReplacement(
           context,

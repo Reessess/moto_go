@@ -49,12 +49,8 @@ class _BookingScreenState extends State<BookingScreen> {
 
   Future<void> _submitBooking() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    // Convert userId from String? to int?
-    final String? userIdStr = userProvider.userId;
     final int? userId = int.tryParse(userProvider.userId ?? '');
 
-    // Convert bike id safely
     final dynamic bikeIdRaw = widget.selectedBike.id;
     final int? bikeId = (bikeIdRaw is int)
         ? bikeIdRaw
@@ -157,8 +153,7 @@ class _BookingScreenState extends State<BookingScreen> {
               margin: const EdgeInsets.only(bottom: 16),
               child: ListTile(
                 leading: const Icon(Icons.person),
-                title:
-                Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                title: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(userEmail),
               ),
             ),
