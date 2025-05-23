@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:moto_go/providers/user_provider.dart'; // <-- Import PaymentProvider
 import 'Screens/login_screen.dart';
 import 'package:moto_go/providers/bike_provider.dart';
+import 'package:moto_go/providers/booking_provider.dart';
 
 void main() {
   runApp(
@@ -10,6 +11,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => BikeProvider()),
+        ChangeNotifierProvider(create: (_) => BookingProvider()),
       ],
       child: const MyApp(),
     ),

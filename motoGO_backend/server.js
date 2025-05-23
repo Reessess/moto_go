@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const db = require('./models/db');
 const authRoutes = require('./routes/authRoutes');
 const bikeRoutes = require('./routes/bikeRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+
 const cors = require('cors');
 dotenv.config();
 const app = express();
@@ -13,7 +15,11 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+// Use Bikes routes
 app.use('/api/bikes', bikeRoutes);
+// Use booking routes
+app.use('/api/bookings', bookingRoutes);
+
 // DB connection test
 app.get('/test-db', async (req, res) => {
   try {
