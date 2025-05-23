@@ -6,12 +6,6 @@ import 'package:moto_go/Menu/setting_screen.dart';
 import 'package:moto_go/Menu/profile_screen.dart';
 import 'package:moto_go/Menu/bike_screen.dart';
 import 'package:moto_go/Model/bike.dart';
-import 'package:moto_go/Screens/bike_details_screen.dart';
-import 'package:moto_go/Screens/booking_screen.dart';  // <-- Import BookingScreen
-import 'package:moto_go/providers/bike_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:moto_go/Search/BikeSearchScreen.dart';
-import 'package:moto_go/Screens/booking_screen.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -59,6 +53,7 @@ class _HomescreenState extends State<Homescreen> {
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
+
     setState(() => _selectedIndex = index);
 
     if (index == 1) {
@@ -223,13 +218,12 @@ class _HomescreenState extends State<Homescreen> {
                           ),
                         ),
                         IconButton(
-                          icon:
-                          const Icon(Icons.search, size: 28, color: Colors.black),
+                          icon: const Icon(Icons.search,
+                              size: 28, color: Colors.black),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const BikeSearchScreen()),
+                            showSearch(
+                              context: context,
+                              delegate: BikeSearchDelegate(_bikes),
                             );
                           },
                         ),
@@ -303,79 +297,89 @@ class _HomescreenState extends State<Homescreen> {
   }
 
   Widget _buildBikeCard(BuildContext context, Bikes bike) {
-    return Center(
-      child: Container(
-        width: 250,
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: Colors.white,
-          boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Hero(
-              tag: 'bikeImage_${bike.id}',
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-                child: Image.network(
-                  bike.imageUrl,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Container(color: Colors.grey, height: 200),
+    return Center( // Center the card
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to bike details screen on tapping the card
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BikeDetailsScreen(bike: bike),
+            ),
+          );
+        },
+        child: Container(
+          width: 250,
+          margin: const EdgeInsets.symmetric(horizontal: 8), // Equal spacing for center effect
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.white,
+            boxShadow: const [
+              BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Hero(
+                tag: 'bikeImage_${bike.id}',
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+                  child: Image.network(
+                    bike.imageUrl,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Container(color: Colors.grey, height: 200),
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(bike.brand,
-                      style: const TextStyle(
-                          fontSize: 22, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 6),
-                  Text(bike.model,
-                      style: const TextStyle(fontSize: 16, color: Colors.grey)),
-                  const SizedBox(height: 6),
-                  Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour',
-                      style: const TextStyle(fontSize: 16, color: Colors.orange)),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to BookingScreen with bike details
-                        Navigator.push(
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(bike.brand,
+                        style: const TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    Text(bike.model,
+                        style: const TextStyle(fontSize: 16, color: Colors.grey)),
+                    const SizedBox(height: 6),
+                    Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour',
+                        style: const TextStyle(fontSize: 16, color: Colors.orange)),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                            builder: (context) => BookingScreen(selectedBike: bike),
+                              builder: (context) => BikeDetailsScreen(bike: bike),
                             ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
+                        child: const Text('Book'),
                       ),
-                      child: const Text('Book Now',
-                          style: TextStyle(fontSize: 18)),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
 
   Widget _buildTopPickCard(BuildContext context, Bikes bike) {
     return GestureDetector(
@@ -383,77 +387,279 @@ class _HomescreenState extends State<Homescreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (_) => BikeDetailsScreen(bike: bike)),
+            builder: (context) => BikeDetailsScreen(bike: bike),
+          ),
         );
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: Colors.white,
           boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+            BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
           ],
         ),
-        child: Row(
-          children: [
-            Hero(
-              tag: 'bikeImage_${bike.id}',
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  bike.imageUrl,
-                  height: 100,
-                  width: 150,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Container(color: Colors.grey, height: 100, width: 150),
+        child: ListTile(
+          leading: Hero(
+            tag: 'bikeImage_${bike.id}',
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                bike.imageUrl,
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Container(color: Colors.grey, width: 80, height: 80),
+              ),
+            ),
+          ),
+          title: Text(
+            '${bike.brand} ${bike.model}',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour'),
+          trailing: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BikeDetailsScreen(bike: bike),
                 ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(bike.brand,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 6),
-                  Text(bike.model,
-                      style: const TextStyle(fontSize: 16, color: Colors.grey)),
-                  const SizedBox(height: 6),
-                  Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour',
-                      style: const TextStyle(fontSize: 16, color: Colors.orange)),
-                ],
-              ),
-            ),
-          ],
+            child: const Text('Book'),
+          ),
         ),
       ),
     );
   }
 }
 
+// New BikeDetailsScreen widget:
+class BikeDetailsScreen extends StatelessWidget {
+  final Bikes bike;
+  const BikeDetailsScreen({required this.bike, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${bike.brand} ${bike.model}'),
+        backgroundColor: Colors.orange,
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Hero(
+            tag: 'bikeImage_${bike.id}',
+            child: Image.network(
+              bike.imageUrl,
+              height: 250,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  Container(color: Colors.grey, height: 250),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              bike.brand,
+              style: const TextStyle(
+                  fontSize: 28, fontWeight: FontWeight.bold, fontFamily: 'nunito'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Text(
+              bike.model,
+              style: const TextStyle(fontSize: 22, color: Colors.grey),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              '\$${bike.pricePerHour.toStringAsFixed(2)}/hour',
+              style: const TextStyle(fontSize: 22, color: Colors.orange),
+            ),
+          ),const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'Two wheels, endless journeys. Rent your ride today.',
+              style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
+              textAlign: TextAlign.center, // Center the quote
+            ),
+          ),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: () {
+                // TODO: Implement actual booking flow or navigate to booking screen
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Booking functionality coming soon!')),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text(
+                'Book Now',
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Painter class unchanged
 class MapShapePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.orange.withOpacity(0.15)
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..color = Colors.orange.withOpacity(0.15);
 
-    final path = Path()
-      ..moveTo(0, size.height * 0.4)
-      ..cubicTo(size.width * 0.2, size.height * 0.3, size.width * 0.8,
-          size.height * 0.6, size.width, size.height * 0.4)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
+    final path = Path();
+    path.moveTo(size.width * 0.2, size.height * 0.15);
+    path.quadraticBezierTo(
+      size.width * 0.25,
+      size.height * 0.05,
+      size.width * 0.4,
+      size.height * 0.1,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.7,
+      size.height * 0.3,
+      size.width * 0.7,
+      size.height * 0.5,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.75,
+      size.height * 0.7,
+      size.width * 0.55,
+      size.height * 0.85,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.4,
+      size.height * 0.95,
+      size.width * 0.15,
+      size.height * 0.7,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.05,
+      size.height * 0.6,
+      size.width * 0.2,
+      size.height * 0.15,
+    );
 
     canvas.drawPath(path, paint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Bike Search Delegate unchanged
+class BikeSearchDelegate extends SearchDelegate {
+  final List<Bikes> bikes;
+
+  BikeSearchDelegate(this.bikes);
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+          onPressed: () {
+            query = '';
+          },
+          icon: const Icon(Icons.clear))
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+        onPressed: () {
+          close(context, null);
+        },
+        icon: const Icon(Icons.arrow_back));
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    final results = bikes.where((bike) =>
+    bike.brand.toLowerCase().contains(query.toLowerCase()) ||
+        bike.model.toLowerCase().contains(query.toLowerCase()));
+
+    return ListView(
+      children: results
+          .map((bike) => ListTile(
+        leading: Image.network(
+          bike.imageUrl,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              Container(color: Colors.grey, width: 50, height: 50),
+        ),
+        title: Text('${bike.brand} ${bike.model}'),
+        subtitle: Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour'),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BikeDetailsScreen(bike: bike),
+            ),
+          );
+        },
+      ))
+          .toList(),
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestions = bikes.where((bike) =>
+    bike.brand.toLowerCase().startsWith(query.toLowerCase()) ||
+        bike.model.toLowerCase().startsWith(query.toLowerCase()));
+
+    return ListView(
+      children: suggestions
+          .map((bike) => ListTile(
+        leading: Image.network(
+          bike.imageUrl,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              Container(color: Colors.grey, width: 50, height: 50),
+        ),
+        title: Text('${bike.brand} ${bike.model}'),
+        subtitle: Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour'),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BikeDetailsScreen(bike: bike),
+            ),
+          );
+        },
+      ))
+          .toList(),
+    );
+  }
 }

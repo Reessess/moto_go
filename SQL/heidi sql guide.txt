@@ -1,5 +1,5 @@
 
-users
+users sql
 id
 first_name
 middle_name
@@ -10,7 +10,7 @@ phone
 dob
 password
 
-bikes
+bikes sql
 
 id 
 brand
@@ -20,6 +20,27 @@ imageUrl
 status
 created_at (dont include)
 
+CREATE TABLE bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    bike_id INT NOT NULL,
+    user_id INT NOT NULL,
+    pickup_datetime DATETIME NOT NULL,
+    hours INT NOT NULL,
+    total_cost DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Foreign key constraints
+    CONSTRAINT fk_bike
+        FOREIGN KEY (bike_id) REFERENCES bikes(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
 json body for bikes
 {
   "brand": "Yamaha",
@@ -28,7 +49,14 @@ json body for bikes
   "imageUrl": "https://example.com/yamaha-r3.jpg",
   "status": "available"
 }
-
+{
+    "id": 2,
+    "bike_id": 5,
+    "user_id": 101,
+    "pickup_datetime": "2025-05-25T14:30:00",
+    "hours": 5,
+    "total_cost": 250
+  }
 
 CREATE TABLE bikes (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -55,4 +83,85 @@ nodeman server.js
 node server.js
 
 Full code fix please should be provided while the others is preserved
+
+ [
+ {
+    "brand": "Kawasaki",
+    "model": "Ninja ZX-6R",
+    "pricePerHour": 185.0,
+    "imageUrl": "https://yamahamotorsports.com/media/images_products/2024-yzf-r3/1920px/2024-YAM-YZFR3ANL-US-DPBSE-STA-2887-01.JPG.webp",
+    "status": "available"
+  },
+  {
+    "brand": "Harley-Davidson",
+    "model": "Iron 883",
+    "pricePerHour": 210.5,
+    "imageUrl": "https://cdpcdn.dx1app.com/products/USA/YA/2025/MC/SUPERSPORT/YZF-R3/50/LUNAR_WHITE_-_NEBULA_BLUE/2000000001.jpg",
+    "status": "available"
+  },
+  {
+    "brand": "BMW",
+    "model": "S 1000 RR",
+    "pricePerHour": 295.0,
+    "imageUrl": "https://cdpcdn.dx1app.com/products/USA/YA/2023/MC/SUPERSPORT/YZF-R3_ABS/50/MIDNIGHT_BLACK/2000000015.jpg",
+    "status": "available"
+  },
+  {
+    "brand": "Honda",
+    "model": "CBR1000RR",
+    "pricePerHour": 220.25,
+    "imageUrl": "https://cdpcdn.dx1app.com/products/USA/YA/2023/MC/SUPERSPORT/YZF-R3_ABS/50/PHANTOM_PURPLE/2000000001_480px.jpg",
+    "status": "available"
+  },
+  {
+    "brand": "Suzuki",
+    "model": "GSX-R1000",
+    "pricePerHour": 245.0,
+    "imageUrl": "https://cdpcdn.dx1app.com/products/USA/YA/2025/MC/SUPERSPORT/YZF-R3/50/MATTE_STEALTH_BLACK/2000000003_480px.jpg",
+    "status": "available"
+  },
+  {
+    "brand": "Aprilia",
+    "model": "RSV4",
+    "pricePerHour": 270.0,
+    "imageUrl": "https://yamahamotorsports.com/media/images/icons/products/25_YZFR3ASL.png",
+    "status": "available"
+  },
+  {
+    "brand": "Yamaha",
+    "model": "MT-10",
+    "pricePerHour": 198.5,
+    "imageUrl": "https://cdnmedia.endeavorsuite.com/images/ThumbGenerator/Thumb.aspx?f=1&img=%2F%2Fcdnmedia.endeavorsuite.com%2Fimages%2Fcatalogs%2F23298%2Fproducts%2Fdetail%2Ff905f83e-d46f-483f-a386-a1772ce14429.jpg&mh=563&mw=1000",
+    "status": "available"
+  },
+  {
+    "brand": "Triumph",
+    "model": "Speed Triple 1200 RS",
+    "pricePerHour": 225.75,
+    "imageUrl": "https://d2bywgumb0o70j.cloudfront.net/2025/05/15/a7c6882a33cab561d34a77ed5fa643b3_45a6e2698d7cbe7a.jpg",
+    "status": "available"
+  },
+  {
+    "brand": "KTM",
+    "model": "1290 Super Duke R",
+    "pricePerHour": 260.0,
+    "imageUrl": "https://cdpcdn.dx1app.com/products/USA/YA/2025/MC/SUPERSPORT/YZF-R3/50/TEAM_YAMAHA_BLUE/2000000003_480px.jpg",
+    "status": "available"
+  },
+  {
+    "brand": "MV Agusta",
+    "model": "Brutale 1000 RR",
+    "pricePerHour": 300.0,
+    "imageUrl": "https://i.ebayimg.com/images/g/cc0AAOSwZ-piQvTh/s-l1200.jpg",
+    "status": "available"
+  }
+ ]
+Added a new BikeDetailsScreen widget that shows bike details and a "Book Now" button.
+
+Modified your _buildBikeCard and _buildTopPickCard so tapping either the card image or "Book" button navigates to BikeDetailsScreen.
+
+No changes to your existing code structure or UI except adding this navigation.
+
+quotes for buildbikecard
+Two wheels, endless journeys. Rent your ride today.
 

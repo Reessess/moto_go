@@ -1,5 +1,5 @@
 class Bikes {
-  final int id;
+  final String id;
   final String brand;
   final String model;
   final String imageUrl;
@@ -32,7 +32,7 @@ class Bikes {
     }
 
     return Bikes(
-      id: parseId(json['id']),
+      id: json['id'].toString(),
       brand: json['brand']?.toString() ?? '',
       model: json['model']?.toString() ?? '',
       imageUrl: json['imageUrl']?.toString() ?? '',
