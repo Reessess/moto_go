@@ -1,17 +1,13 @@
+import 'dart:convert'; // for json decode
 import 'package:flutter/material.dart';
 import 'package:moto_go/Menu/setting_screen.dart';
 import 'package:moto_go/Menu/profile_screen.dart';
 import 'package:moto_go/Transaction/booking_transaction.dart';
 import 'package:moto_go/Transaction/my_bookings_screen.dart';
-import 'package:moto_go/Menu/bike_screen.dart'; // <-- Make sure this exists
-
-final List<Map<String, dynamic>> bikeList = [
-  {'image': 'assets/bike1.PNG', 'label': 'Yamaha R15', 'price': 280},
-  {'image': 'assets/bike2.PNG', 'label': 'KTM Duke 200', 'price': 240},
-  {'image': 'assets/bike3.PNG', 'label': 'Suzuki Raider', 'price': 150},
-  {'image': 'assets/bike4.PNG', 'label': 'Honda CBR', 'price': 300},
-  {'image': 'assets/bike5.PNG', 'label': 'Kawasaki Z400', 'price': 190},
-];
+import 'package:moto_go/Menu/bike_screen.dart';
+import 'package:http/http.dart' as http; // add http for fetching
+// Import your Bikes class (make sure path is correct)
+import 'package:moto_go/Model/bike.dart'; // adjust path as needed
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -22,6 +18,42 @@ class Homescreen extends StatefulWidget {
 
 class _HomescreenState extends State<Homescreen> {
   int _selectedIndex = 0;
+
+  // List of Bikes instead of Map
+  List<Bikes> _bikes = [];
+  bool _isLoading = true;
+  String _error = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBikes();
+  }
+
+  Future<void> fetchBikes() async {
+    try {
+      // Replace the below URL with your actual API endpoint
+      final response = await http.get(Uri.parse('http://192.168.5.129:3000/api/bikes'));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _bikes = data.map((json) => Bikes.fromJson(json)).toList();
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = 'Failed to load bikes';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _error = 'Error fetching bikes: $e';
+        _isLoading = false;
+      });
+    }
+  }
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
@@ -173,14 +205,17 @@ class _HomescreenState extends State<Homescreen> {
               size: Size.infinite,
               painter: MapShapePainter(),
             ),
-            SingleChildScrollView(
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _error.isNotEmpty
+                ? Center(child: Text(_error))
+                : SingleChildScrollView(
               padding: const EdgeInsets.only(bottom: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -203,7 +238,7 @@ class _HomescreenState extends State<Homescreen> {
                           onPressed: () {
                             showSearch(
                               context: context,
-                              delegate: BikeSearchDelegate(bikeList),
+                              delegate: BikeSearchDelegate(_bikes),
                             );
                           },
                         ),
@@ -227,10 +262,10 @@ class _HomescreenState extends State<Homescreen> {
                     height: height * 0.5,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: bikeList.length,
+                      itemCount: _bikes.length,
                       padding: const EdgeInsets.only(left: 16),
                       itemBuilder: (context, index) {
-                        final bike = bikeList[index];
+                        final bike = _bikes[index];
                         return _buildBikeCard(context, bike);
                       },
                     ),
@@ -251,9 +286,9 @@ class _HomescreenState extends State<Homescreen> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: bikeList.length,
+                    itemCount: _bikes.length,
                     itemBuilder: (context, index) {
-                      final bike = bikeList[index];
+                      final bike = _bikes[index];
                       return _buildTopPickCard(context, bike);
                     },
                   ),
@@ -282,7 +317,7 @@ class _HomescreenState extends State<Homescreen> {
     );
   }
 
-  Widget _buildBikeCard(BuildContext context, Map<String, dynamic> bike) {
+  Widget _buildBikeCard(BuildContext context, Bikes bike) {
     return Container(
       width: 250,
       margin: const EdgeInsets.only(right: 16),
@@ -290,76 +325,83 @@ class _HomescreenState extends State<Homescreen> {
         borderRadius: BorderRadius.circular(16),
         color: Colors.grey[100],
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(2, 4))
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 4)),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(
-              bike['image'],
-              height: double.infinity,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            Text(
+              bike.brand,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontFamily: 'nunito',
+                color: Colors.black87,
+              ),
             ),
-            Positioned(
-              top: 12,
-              left: 12,
-              child: Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  bike['label'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'nunito',
-                    color: Colors.white,
-                  ),
+            Text(
+              bike.model,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                fontFamily: 'nunito',
+                color: Colors.black54,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  bike.imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Center(child: Icon(Icons.broken_image));
+                  },
                 ),
               ),
             ),
-            Positioned(
-              bottom: 20,
-              left: 16,
-              right: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${bike['price']} / Hour',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'nunito',
-                      color: Colors.orange,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) =>
-                                BookingTransactionScreen(bike: bike)),
-                      );
-                    },
-                    child: const Text('Book Now'),
-                  ),
-                ],
+            const SizedBox(height: 10),
+            Text(
+              '₱${bike.pricePerHour.toStringAsFixed(2)} / hour',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.orange,
               ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              ),
+              child: const Text(
+                'Rent Now',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BookingTransactionScreen(bike: bike.toJson()),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -367,96 +409,156 @@ class _HomescreenState extends State<Homescreen> {
     );
   }
 
-  Widget _buildTopPickCard(BuildContext context, Map<String, dynamic> bike) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
-          ],
-        ),
-        child: ListTile(
-          leading: Image.asset(
-            bike['image'],
-            width: 80,
+  Widget _buildTopPickCard(BuildContext context, Bikes bike) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.grey[100],
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 4)),
+        ],
+      ),
+      child: ListTile(
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(
+            bike.imageUrl,
+            width: 60,
+            height: 60,
             fit: BoxFit.cover,
-          ),
-          title: Text(
-            bike['label'],
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, fontFamily: 'nunito'),
-          ),
-          subtitle: Text('${bike['price']} / Hour',
-              style: const TextStyle(color: Colors.orange)),
-          trailing: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => BookingTransactionScreen(bike: bike)),
-              );
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return const Center(child: CircularProgressIndicator());
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text('Book'),
+            errorBuilder: (context, error, stackTrace) {
+              return const Icon(Icons.broken_image);
+            },
           ),
         ),
+        title: Text(
+          bike.brand,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        subtitle: Text(
+          bike.model,
+          style: const TextStyle(fontSize: 14, color: Colors.black54),
+        ),
+        trailing: Text(
+          '₱${bike.pricePerHour.toStringAsFixed(2)}',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.orange,
+          ),
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BookingTransactionScreen(bike: bike.toJson()),
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-class BikeSearchDelegate extends SearchDelegate<String> {
-  final List<Map<String, dynamic>> bikeList;
+class BikeSearchDelegate extends SearchDelegate {
+  final List<Bikes> bikes;
 
-  BikeSearchDelegate(this.bikeList);
-
-  @override
-  List<Widget>? buildActions(BuildContext context) =>
-      [IconButton(icon: const Icon(Icons.clear), onPressed: () => query = '')];
+  BikeSearchDelegate(this.bikes);
 
   @override
-  Widget? buildLeading(BuildContext context) => IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () => close(context, ''),
-  );
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+          showSuggestions(context);
+        },
+      ),
+    ];
+  }
 
   @override
-  Widget buildResults(BuildContext context) => _buildSearchResults();
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => close(context, null),
+    );
+  }
 
   @override
-  Widget buildSuggestions(BuildContext context) => _buildSearchResults();
+  Widget buildResults(BuildContext context) {
+    final results = bikes.where((bike) =>
+    bike.brand.toLowerCase().contains(query.toLowerCase()) ||
+        bike.model.toLowerCase().contains(query.toLowerCase())).toList();
 
-  Widget _buildSearchResults() {
-    final results = bikeList
-        .where((bike) =>
-        bike['label'].toLowerCase().contains(query.toLowerCase()))
-        .toList();
+    return _buildResultList(context, results);
+  }
 
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestions = bikes.where((bike) =>
+    bike.brand.toLowerCase().contains(query.toLowerCase()) ||
+        bike.model.toLowerCase().contains(query.toLowerCase())).toList();
+
+    return _buildResultList(context, suggestions);
+  }
+
+  Widget _buildResultList(BuildContext context, List<Bikes> results) {
+    if (results.isEmpty) {
+      return const Center(child: Text('No bikes found'));
+    }
     return ListView.builder(
       itemCount: results.length,
       itemBuilder: (context, index) {
         final bike = results[index];
         return ListTile(
-          leading: Image.asset(bike['image'], width: 60),
-          title: Text(bike['label']),
-          subtitle: Text('${bike['price']} / Hour'),
+          title: Text('${bike.brand} ${bike.model}'),
+          subtitle: Text('₱${bike.pricePerHour.toStringAsFixed(2)} / hour'),
           onTap: () {
+            close(context, null);
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => BookingTransactionScreen(bike: bike)),
+                builder: (_) => BookingTransactionScreen(bike: bike.toJson()),
+              ),
             );
           },
         );
       },
     );
   }
+}
+
+// Your existing MapShapePainter stays unchanged
+class MapShapePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.orange.withOpacity(0.4)
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, size.height * 0.3);
+    path.quadraticBezierTo(size.width * 0.3, size.height * 0.4,
+        size.width * 0.5, size.height * 0.2);
+    path.quadraticBezierTo(size.width * 0.7, size.height * 0.05,
+        size.width, size.height * 0.3);
+    path.lineTo(size.width, 0);
+    path.lineTo(0, 0);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
