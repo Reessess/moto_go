@@ -11,7 +11,7 @@ import 'package:moto_go/Screens/booking_screen.dart';  // <-- Import BookingScre
 import 'package:moto_go/providers/bike_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:moto_go/Search/BikeSearchScreen.dart';
-import 'package:moto_go/Screens/booking_screen.dart';
+import 'package:moto_go/Screens/login_screen.dart'; // <-- Import LoginScreen
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -180,7 +180,7 @@ class _HomescreenState extends State<Homescreen> {
                   const Text('Logout', style: TextStyle(color: Colors.orange)),
                   onTap: () {
                     Navigator.pop(context);
-                    // TODO: Implement logout
+                    _showLogoutConfirmationDialog(context);
                   },
                 ),
               ),
@@ -352,10 +352,10 @@ class _HomescreenState extends State<Homescreen> {
                       onPressed: () {
                         // Navigate to BookingScreen with bike details
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
+                          context,
+                          MaterialPageRoute(
                             builder: (context) => BookingScreen(selectedBike: bike),
-                            ),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -431,6 +431,34 @@ class _HomescreenState extends State<Homescreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()), // Navigate to LoginScreen
+              );
+            },
+            child: const Text('Logout'),
+          ),
+        ],
       ),
     );
   }
