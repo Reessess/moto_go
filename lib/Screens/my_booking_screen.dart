@@ -42,7 +42,7 @@ class MyBookingsScreen extends StatelessWidget {
                   itemCount: bookingProvider.bookings.length,
                   itemBuilder: (context, index) {
                     final booking = bookingProvider.bookings[index];
-                    final formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(booking.pickupDateTime);
+                    final formattedDate = DateFormat('yyyy-MM-dd hh:mm a').format(booking.pickupDateTime);
 
                     return Card(
                       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -81,9 +81,13 @@ class MyBookingsScreen extends StatelessWidget {
                                     color: Colors.green,
                                   ),
                                 ),
-                                TextButton.icon(
-                                  icon: const Icon(Icons.cancel, color: Colors.red),
-                                  label: const Text('Cancel', style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 8,
+                              children: [
+                                ElevatedButton.icon(
                                   onPressed: () async {
                                     final confirm = await showDialog<bool>(
                                       context: context,
@@ -117,6 +121,33 @@ class MyBookingsScreen extends StatelessWidget {
                                       }
                                     }
                                   },
+                                  icon: const Icon(Icons.cancel, color: Colors.white),
+                                  label: const Text('Cancel'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/payment',
+                                      arguments: booking,
+                                    );
+                                  },
+                                  icon: const Icon(Icons.payment),
+                                  label: const Text('Make Payment'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blueAccent,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

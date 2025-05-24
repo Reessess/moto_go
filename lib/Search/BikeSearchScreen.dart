@@ -115,12 +115,23 @@ class _BikeSearchScreenState extends State<BikeSearchScreen> {
                             color: Colors.grey),
                   ),
                   title: Text(bike.brand),
-                  subtitle: Text(bike.model),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(bike.model),
+                      if (bike.status == 'unavailable')
+                        Text(
+                          'Unavailable',
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                    ],
+                  ),
                   trailing: Text(
                     '\₱${bike.pricePerHour.toStringAsFixed(2)}/hr',
                     style: const TextStyle(color: Colors.orange),
                   ),
-                  onTap: () {
+                  onTap: bike.status == 'available'
+                      ? () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -128,7 +139,12 @@ class _BikeSearchScreenState extends State<BikeSearchScreen> {
                             BookingScreen(selectedBike: bike),
                       ),
                     );
-                  },
+                  }
+                      : null,
+                  // Disable tap if bike is unavailable
+                  tileColor: bike.status == 'unavailable'
+                      ? Colors.grey[200]
+                      : null, // Change color if unavailable
                 );
               },
             ),

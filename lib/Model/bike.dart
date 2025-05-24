@@ -4,6 +4,7 @@ class Bikes {
   final String model;
   final String imageUrl;
   final double pricePerHour;
+  final String status; // New field for status
 
   Bikes({
     required this.id,
@@ -11,6 +12,7 @@ class Bikes {
     required this.model,
     required this.imageUrl,
     required this.pricePerHour,
+    required this.status, // Include status in the constructor
   });
 
   factory Bikes.fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,7 @@ class Bikes {
       model: json['model']?.toString() ?? '',
       imageUrl: json['imageUrl']?.toString() ?? '',
       pricePerHour: parsePrice(json['pricePerHour']),
+      status: json['status']?.toString() ?? 'unavailable', // Default to 'unavailable' if not present
     );
   }
 
@@ -47,6 +50,7 @@ class Bikes {
       'model': model,
       'imageUrl': imageUrl,
       'pricePerHour': pricePerHour,
+      'status': status, // Include status in the JSON output
     };
   }
 }

@@ -7,14 +7,15 @@ import 'package:moto_go/Menu/profile_screen.dart';
 import 'package:moto_go/Menu/bike_screen.dart';
 import 'package:moto_go/Model/bike.dart';
 import 'package:moto_go/Screens/bike_details_screen.dart';
-import 'package:moto_go/Screens/booking_screen.dart';  // <-- Import BookingScreen
+import 'package:moto_go/Screens/booking_screen.dart';
 import 'package:moto_go/providers/bike_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:moto_go/Search/BikeSearchScreen.dart';
-import 'package:moto_go/Screens/login_screen.dart'; // <-- Import LoginScreen
+import 'package:moto_go/Screens/login_screen.dart';
 import 'package:moto_go/Screens/my_booking_screen.dart';
 import 'package:moto_go/Screens/ride_history_screen.dart';
 import 'package:moto_go/providers/user_provider.dart';
+
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
 
@@ -80,7 +81,7 @@ class _HomescreenState extends State<Homescreen> {
           print('Invalid user ID format');
         }
       } else {
-        print('User is not logged in');
+        print('User  is not logged in');
       }
     }
   }
@@ -102,6 +103,10 @@ class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
+
+    // Separate available and unavailable bikes based on the status field
+    List<Bikes> availableBikes = _bikes.where((bike) => bike.status == 'available').toList();
+    List<Bikes> unavailableBikes = _bikes.where((bike) => bike.status == 'unavailable').toList();
 
     return Scaffold(
       drawer: SafeArea(
@@ -172,11 +177,13 @@ class _HomescreenState extends State<Homescreen> {
                 child: ListTile(
                   leading: const Icon(Icons.book_online),
                   title: const Text('My Bookings'),
-                  onTap: () { Navigator.pop(context);  // Close drawer first
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
-                  );},
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
+                    );
+                  },
                 ),
               ),
               _buildMenuTile(
@@ -245,24 +252,23 @@ class _HomescreenState extends State<Homescreen> {
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      'Pick Your Bike',
+                      'Available Bikes',
                       style: TextStyle(
-                        fontSize: 32,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'nunito',
-                        color: Colors.black,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 16),
                   SizedBox(
                     height: height * 0.5,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: _bikes.length,
+                      itemCount: availableBikes.length,
                       padding: const EdgeInsets.only(left: 16),
                       itemBuilder: (context, index) {
-                        final bike = _bikes[index];
+                        final bike = availableBikes[index];
                         return _buildBikeCard(context, bike);
                       },
                     ),
@@ -271,7 +277,7 @@ class _HomescreenState extends State<Homescreen> {
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      'Top Picks ⭐',
+                      'Unavailable Bikes',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -283,9 +289,9 @@ class _HomescreenState extends State<Homescreen> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _bikes.length,
+                    itemCount: unavailableBikes.length,
                     itemBuilder: (context, index) {
-                      final bike = _bikes[index];
+                      final bike = unavailableBikes[index];
                       return _buildTopPickCard(context, bike);
                     },
                   ),
@@ -355,7 +361,7 @@ class _HomescreenState extends State<Homescreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: bike.status == 'available' ? () {
                         // Navigate to BookingScreen with bike details
                         Navigator.push(
                           context,
@@ -363,15 +369,14 @@ class _HomescreenState extends State<Homescreen> {
                             builder: (context) => BookingScreen(selectedBike: bike),
                           ),
                         );
-                      },
+                      } : null, // Disable button if bike is unavailable
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
+                        backgroundColor: bike.status == 'available' ? Colors.orange : Colors.grey, // Change color based on availability
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: const Text('Book Now',
-                          style: TextStyle(fontSize: 18)),
+                      child: Text(bike.status == 'available' ? 'Book Now' : 'Unavailable', style: const TextStyle(fontSize: 18)),
                     ),
                   ),
                 ],
@@ -437,7 +442,7 @@ class _HomescreenState extends State<Homescreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: bike.status == 'available' ? () {
                       // Navigate to BookingScreen with bike details
                       Navigator.push(
                         context,
@@ -445,14 +450,14 @@ class _HomescreenState extends State<Homescreen> {
                           builder: (context) => BookingScreen(selectedBike: bike),
                         ),
                       );
-                    },
+                    } : null, // Disable button if bike is unavailable
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                      backgroundColor: bike.status == 'available' ? Colors.orange : Colors.grey, // Change color based on availability
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text('Book Now', style: TextStyle(fontSize: 18)),
+                    child: Text(bike.status == 'available' ? 'Book Now' : 'Unavailable', style: const TextStyle(fontSize: 18)),
                   ),
                 ),
               ],
@@ -462,7 +467,6 @@ class _HomescreenState extends State<Homescreen> {
       ),
     );
   }
-
 
   void _showLogoutConfirmationDialog(BuildContext context) {
     showDialog(
