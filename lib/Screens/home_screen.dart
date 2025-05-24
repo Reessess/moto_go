@@ -67,7 +67,7 @@ class _HomescreenState extends State<Homescreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Ride History'),
-          content: const Text('Ride History feature coming soon!'),
+          content: const Text('No Ride History yet'),
           actions: [
             TextButton(
               onPressed: () {
@@ -348,7 +348,7 @@ class _HomescreenState extends State<Homescreen> {
                   Text(bike.model,
                       style: const TextStyle(fontSize: 16, color: Colors.grey)),
                   const SizedBox(height: 6),
-                  Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour',
+                  Text('\₱${bike.pricePerHour.toStringAsFixed(2)}/hour',
                       style: const TextStyle(fontSize: 16, color: Colors.orange)),
                   const SizedBox(height: 12),
                   SizedBox(

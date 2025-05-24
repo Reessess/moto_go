@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:moto_go/Model/bike.dart';
 import 'package:moto_go/Screens/bike_details_screen.dart';
+import 'package:moto_go/Screens/booking_screen.dart';
 
 class BikeSearchScreen extends StatefulWidget {
   const BikeSearchScreen({Key? key}) : super(key: key);
@@ -116,7 +117,7 @@ class _BikeSearchScreenState extends State<BikeSearchScreen> {
                   title: Text(bike.brand),
                   subtitle: Text(bike.model),
                   trailing: Text(
-                    '\$${bike.pricePerHour.toStringAsFixed(2)}/hr',
+                    '\₱${bike.pricePerHour.toStringAsFixed(2)}/hr',
                     style: const TextStyle(color: Colors.orange),
                   ),
                   onTap: () {
@@ -124,7 +125,7 @@ class _BikeSearchScreenState extends State<BikeSearchScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            BikeDetailsScreen(bike: bike),
+                            BookingScreen(selectedBike: bike),
                       ),
                     );
                   },
