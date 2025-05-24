@@ -8,6 +8,7 @@ class Booking {
   final String bikeBrand;
   final String bikeModel;
   final double pricePerHour;
+  final String status;  // <-- added status here
 
   Booking({
     required this.id,
@@ -19,6 +20,7 @@ class Booking {
     required this.bikeBrand,
     required this.bikeModel,
     required this.pricePerHour,
+    required this.status,  // <-- add status in constructor
   });
 
   factory Booking.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,7 @@ class Booking {
       pricePerHour: (json['pricePerHour'] is String)
           ? double.parse(json['pricePerHour'])
           : (json['pricePerHour'] as num).toDouble(),
+      status: json['status'] ?? 'pending',  // <-- parse status, default to 'pending' if null
     );
   }
 }

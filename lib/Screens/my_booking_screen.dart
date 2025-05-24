@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:moto_go/providers/booking_provider.dart';
 import 'package:moto_go/providers/user_provider.dart';
 
+
 class MyBookingsScreen extends StatelessWidget {
   const MyBookingsScreen({Key? key}) : super(key: key);
 
@@ -44,6 +45,19 @@ class MyBookingsScreen extends StatelessWidget {
                     final booking = bookingProvider.bookings[index];
                     final formattedDate = DateFormat('yyyy-MM-dd hh:mm a').format(booking.pickupDateTime);
 
+                    Color getStatusColor(String status) {
+                      switch (status.toLowerCase()) {
+                        case 'pending':
+                          return Colors.orange;
+                        case 'paid':
+                          return Colors.green;
+                        case 'failed':
+                          return Colors.red;
+                        default:
+                          return Colors.grey;
+                      }
+                    }
+
                     return Card(
                       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                       elevation: 3,
@@ -68,6 +82,14 @@ class MyBookingsScreen extends StatelessWidget {
                             Text(
                               'Hours: ${booking.hours}',
                               style: const TextStyle(fontSize: 14),
+                            ),
+                            Text(
+                              'Status: ${booking.status != null && booking.status.isNotEmpty ? booking.status[0].toUpperCase() + booking.status.substring(1) : "Unknown"}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: booking.status != null ? getStatusColor(booking.status) : Colors.grey,
+                              ),
                             ),
                             const SizedBox(height: 6),
                             Row(
