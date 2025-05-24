@@ -50,11 +50,7 @@ class _BookingScreenState extends State<BookingScreen> {
   Future<void> _submitBooking() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final int? userId = int.tryParse(userProvider.userId ?? '');
-
-    final dynamic bikeIdRaw = widget.selectedBike.id;
-    final int? bikeId = (bikeIdRaw is int)
-        ? bikeIdRaw
-        : (bikeIdRaw is String ? int.tryParse(bikeIdRaw) : null);
+    final int? bikeId = int.tryParse(widget.selectedBike.id.toString());
 
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -97,6 +93,8 @@ class _BookingScreenState extends State<BookingScreen> {
         body: jsonEncode(bookingData),
       );
 
+      final data = json.decode(response.body);
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Booking successful')),
@@ -104,7 +102,7 @@ class _BookingScreenState extends State<BookingScreen> {
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Booking failed: ${response.body}')),
+          SnackBar(content: Text('Booking failed: ${data['message'] ?? 'Unknown error'}')),
         );
       }
     } catch (e) {
@@ -112,7 +110,7 @@ class _BookingScreenState extends State<BookingScreen> {
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      setState(() => _isSubmitting = false);
+      setState(() => _isSubmitting = false); // Always reset
     }
   }
 
@@ -147,7 +145,6 @@ class _BookingScreenState extends State<BookingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // User Info Display
             Card(
               elevation: 2,
               margin: const EdgeInsets.only(bottom: 16),
@@ -157,8 +154,6 @@ class _BookingScreenState extends State<BookingScreen> {
                 subtitle: Text(userEmail),
               ),
             ),
-
-            // Bike Info Display
             Card(
               elevation: 2,
               margin: const EdgeInsets.only(bottom: 24),
@@ -169,8 +164,6 @@ class _BookingScreenState extends State<BookingScreen> {
                 subtitle: Text('Price per hour: ₱${pricePerHour.toStringAsFixed(2)}'),
               ),
             ),
-
-            // Booking controls
             ListTile(
               title: const Text('Pickup Date & Time'),
               subtitle: Text(formattedDate),
