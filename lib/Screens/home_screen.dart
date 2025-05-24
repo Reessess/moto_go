@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:moto_go/Menu/setting_screen.dart';
 import 'package:moto_go/Menu/profile_screen.dart';
 import 'package:moto_go/Menu/bike_screen.dart';
 import 'package:moto_go/Model/bike.dart';
 import 'package:moto_go/Screens/bike_details_screen.dart';
 import 'package:moto_go/Screens/booking_screen.dart';
-import 'package:moto_go/providers/bike_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:moto_go/Search/BikeSearchScreen.dart';
 import 'package:moto_go/Screens/login_screen.dart';
@@ -403,11 +401,18 @@ class _HomescreenState extends State<Homescreen> {
         children: [
           GestureDetector(
             onTap: () {
-              // Navigate to BikeDetailsScreen when image or left side tapped
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => BikeDetailsScreen(bike: bike)),
-              );
+              if (bike.status == 'available') {
+                // Navigate to BikeDetailsScreen when bike is available
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => BikeDetailsScreen(bike: bike)),
+                );
+              } else {
+                // Show snackbar or dialog if bike is unavailable
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('This bike is currently unavailable.')),
+                );
+              }
             },
             child: Hero(
               tag: 'bikeImage_${bike.id}',
@@ -442,22 +447,29 @@ class _HomescreenState extends State<Homescreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: bike.status == 'available' ? () {
+                    onPressed: bike.status == 'available'
+                        ? () {
                       // Navigate to BookingScreen with bike details
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BookingScreen(selectedBike: bike),
+                          builder: (context) =>
+                              BookingScreen(selectedBike: bike),
                         ),
                       );
-                    } : null, // Disable button if bike is unavailable
+                    }
+                        : null, // Disable button if bike is unavailable
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: bike.status == 'available' ? Colors.orange : Colors.grey, // Change color based on availability
+                      backgroundColor:
+                      bike.status == 'available' ? Colors.orange : Colors.grey,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: Text(bike.status == 'available' ? 'Book Now' : 'Unavailable', style: const TextStyle(fontSize: 18)),
+                    child: Text(
+                      bike.status == 'available' ? 'Book Now' : 'Unavailable',
+                      style: const TextStyle(fontSize: 18),
+                    ),
                   ),
                 ),
               ],
@@ -467,6 +479,7 @@ class _HomescreenState extends State<Homescreen> {
       ),
     );
   }
+
 
   void _showLogoutConfirmationDialog(BuildContext context) {
     showDialog(

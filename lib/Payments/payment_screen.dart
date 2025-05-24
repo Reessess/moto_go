@@ -27,7 +27,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
-    // Generate reference number once when screen opens
     _generatedReference = _uuid.v4();
   }
 
@@ -57,7 +56,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.5.129:3000/api/payments'), // Replace with your backend URL
+        Uri.parse('http://192.168.5.129:3000/api/payments'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(payload),
       );
@@ -83,6 +82,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Payment')),
       body: Padding(
@@ -93,9 +94,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
             children: [
               Text(
                 '${booking.bikeBrand} ${booking.bikeModel}',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.orange.shade800,
+                ),
               ),
-              Text('Total: ₱${booking.totalCost.toStringAsFixed(2)}'),
+              const SizedBox(height: 4),
+              Text(
+                'Total: ₱${booking.totalCost.toStringAsFixed(2)}',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: Colors.grey.shade700,
+                ),
+              ),
               const SizedBox(height: 20),
 
               DropdownButtonFormField<String>(
@@ -104,36 +114,66 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   return DropdownMenuItem(value: method, child: Text(method));
                 }).toList(),
                 onChanged: (value) => setState(() => _method = value!),
-                decoration: const InputDecoration(labelText: 'Payment Method'),
+                decoration: const InputDecoration(
+                  labelText: 'Payment Method',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
               ),
+              const SizedBox(height: 16),
 
               TextFormField(
                 controller: _accountNameController,
-                decoration: const InputDecoration(labelText: 'Account Name'),
-                validator: (value) => value!.isEmpty ? 'Enter account name' : null,
+                decoration: const InputDecoration(
+                  labelText: 'Account Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+                validator: (value) =>
+                value!.isEmpty ? 'Enter account name' : null,
               ),
+              const SizedBox(height: 16),
+
               TextFormField(
                 controller: _accountNumberController,
-                decoration: const InputDecoration(labelText: 'Account Number'),
-                validator: (value) => value!.isEmpty ? 'Enter account number' : null,
+                decoration: const InputDecoration(
+                  labelText: 'Account Number',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+                validator: (value) =>
+                value!.isEmpty ? 'Enter account number' : null,
+                keyboardType: TextInputType.number,
               ),
-
               const SizedBox(height: 20),
 
               Text(
                 'Reference Number:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              SelectableText(_generatedReference), // user can copy it if needed
-
+              SelectableText(_generatedReference),
               const SizedBox(height: 20),
 
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton.icon(
-                icon: const Icon(Icons.send),
-                label: const Text('Submit Payment'),
-                onPressed: _submitPayment,
+                  : SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.send),
+                  label: const Text('Submit Payment'),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  onPressed: _submitPayment,
+                ),
               ),
             ],
           ),
