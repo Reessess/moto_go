@@ -430,7 +430,7 @@ class _HomescreenState extends State<Homescreen> {
                 Text(bike.model,
                     style: const TextStyle(fontSize: 16, color: Colors.grey)),
                 const SizedBox(height: 6),
-                Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour',
+                Text('\₱${bike.pricePerHour.toStringAsFixed(2)}/hour',
                     style: const TextStyle(fontSize: 16, color: Colors.orange)),
                 const SizedBox(height: 12),
                 SizedBox(

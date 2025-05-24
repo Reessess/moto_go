@@ -8,8 +8,9 @@ class BookingProvider with ChangeNotifier {
 
   List<Booking> get bookings => _bookings;
 
+  // Fetch bookings by user ID
   Future<void> fetchBookings(int userId) async {
-    final url = Uri.parse('http://192.168.5.129:3000/api/bookings/$userId'); // ✅ fixed URL
+    final url = Uri.parse('http://192.168.5.129:3000/api/bookings/$userId');
 
     try {
       final response = await http.get(url);
@@ -23,6 +24,24 @@ class BookingProvider with ChangeNotifier {
       }
     } catch (e) {
       throw Exception('Error fetching bookings: $e');
+    }
+  }
+
+  // Cancel a booking by ID
+  Future<void> cancelBooking(int bookingId) async {
+    final url = Uri.parse('http://192.168.5.129:3000/api/bookings/$bookingId');
+
+    try {
+      final response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        _bookings.removeWhere((booking) => booking.id == bookingId);
+        notifyListeners();
+      } else {
+        throw Exception('Failed to cancel booking (Status code: ${response.statusCode})');
+      }
+    } catch (e) {
+      throw Exception('Error cancelling booking: $e');
     }
   }
 }

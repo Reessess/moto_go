@@ -13,4 +13,8 @@ router.get('/', bookingController.getAllBookings);
 
 router.get('/:userId', bookingController.getBookingsByUser);
 
+// In bookingRoutes.js
+router.delete('/:id', bookingController.cancelBooking);
+
+
 module.exports = router;

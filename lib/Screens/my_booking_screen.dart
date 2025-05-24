@@ -20,7 +20,6 @@ class MyBookingsScreen extends StatelessWidget {
       );
     }
 
-    // Fetch bookings once when widget builds
     final bookingProvider = Provider.of<BookingProvider>(context, listen: false);
 
     return Scaffold(
@@ -33,7 +32,6 @@ class MyBookingsScreen extends StatelessWidget {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            // Use Consumer to rebuild UI on bookings change
             return Consumer<BookingProvider>(
               builder: (context, bookingProvider, child) {
                 if (bookingProvider.bookings.isEmpty) {
@@ -72,16 +70,55 @@ class MyBookingsScreen extends StatelessWidget {
                               style: const TextStyle(fontSize: 14),
                             ),
                             const SizedBox(height: 6),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: Text(
-                                'Total: ₱${booking.totalCost.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Total: ₱${booking.totalCost.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                  ),
                                 ),
-                              ),
+                                TextButton.icon(
+                                  icon: const Icon(Icons.cancel, color: Colors.red),
+                                  label: const Text('Cancel', style: TextStyle(color: Colors.red)),
+                                  onPressed: () async {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text('Cancel Booking'),
+                                        content: const Text('Are you sure you want to cancel this booking?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(ctx).pop(false),
+                                            child: const Text('No'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () => Navigator.of(ctx).pop(true),
+                                            child: const Text('Yes'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+
+                                    if (confirm == true) {
+                                      try {
+                                        await Provider.of<BookingProvider>(context, listen: false)
+                                            .cancelBooking(booking.id);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Booking cancelled')),
+                                        );
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Error: $e')),
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
                           ],
                         ),

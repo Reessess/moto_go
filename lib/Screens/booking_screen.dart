@@ -52,24 +52,17 @@ class _BookingScreenState extends State<BookingScreen> {
     final int? bikeId = int.tryParse(widget.selectedBike.id.toString());
 
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User  is not logged in')),
-      );
+      _showMessage('User is not logged in');
       return;
     }
-
     if (bikeId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid bike selected')),
-      );
+      _showMessage('Invalid bike selected');
       return;
     }
 
     final int hours = int.tryParse(_hoursController.text) ?? 0;
     if (_pickupDateTime == null || hours <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter valid pickup time and hours')),
-      );
+      _showMessage('Please enter valid pickup time and hours');
       return;
     }
 
@@ -93,20 +86,18 @@ class _BookingScreenState extends State<BookingScreen> {
       final data = json.decode(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Booking successful')),
-        );
+        _showMessage('Booking successful');
         Navigator.pop(context);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Booking failed: ${data['message'] ?? 'Unknown error'}')),
-        );
+        _showMessage('Booking failed: ${data['message'] ?? 'Unknown error'}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      _showMessage('Error: $e');
     }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -118,65 +109,46 @@ class _BookingScreenState extends State<BookingScreen> {
   @override
   Widget build(BuildContext context) {
     final bike = widget.selectedBike;
-    final pricePerHour = bike.pricePerHour;
-
     final userProvider = Provider.of<UserProvider>(context);
-    final userName = userProvider.username ?? 'Guest User';
-    final userEmail = userProvider.email ?? 'No Email';
-
     final String formattedDate = _pickupDateTime != null
         ? DateFormat('yyyy-MM-dd HH:mm').format(_pickupDateTime!)
         : 'Select pickup date & time';
 
     final int hours = int.tryParse(_hoursController.text) ?? 0;
-    final double totalCost = hours * pricePerHour;
-
-    bool canSubmit = _pickupDateTime != null && hours > 0;
+    final double totalCost = hours * bike.pricePerHour;
+    final bool canSubmit = _pickupDateTime != null && hours > 0;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Book a Bike')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Card(
-              elevation: 2,
-              margin: const EdgeInsets.only(bottom: 16),
-              child: ListTile(
-                leading: const Icon(Icons.person),
-                title: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(userEmail),
-              ),
+            _buildInfoCard(
+              icon: Icons.person,
+              title: userProvider.username ?? 'Guest User',
+              subtitle: userProvider.email ?? 'No Email',
             ),
-            Card(
-              elevation: 2,
-              margin: const EdgeInsets.only(bottom: 24),
-              child: ListTile(
-                leading: const Icon(Icons.directions_bike),
-                title: Text('${bike.brand} ${bike.model}',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('Price per hour: ₱${pricePerHour.toStringAsFixed(2)}'),
-              ),
+            _buildInfoCard(
+              icon: Icons.directions_bike,
+              title: '${bike.brand} ${bike.model}',
+              subtitle: 'Price per hour: ₱${bike.pricePerHour.toStringAsFixed(2)}',
             ),
-            ListTile(
-              title: const Text('Pickup Date & Time'),
-              subtitle: Text(formattedDate),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: _pickDateTime,
-            ),
+            _buildDateTimeTile(formattedDate),
             const SizedBox(height: 12),
             TextField(
               controller: _hoursController,
               decoration: const InputDecoration(
                 labelText: 'Number of Hours',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
               ),
               keyboardType: TextInputType.number,
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 20),
-            if (hours > 0 && _pickupDateTime != null)
+            if (canSubmit)
               Text(
                 'Total Cost: ₱${totalCost.toStringAsFixed(2)}',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -186,11 +158,42 @@ class _BookingScreenState extends State<BookingScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: canSubmit ? _submitBooking : null,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
                 child: const Text('Confirm Booking'),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({required IconData icon, required String title, required String subtitle}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.blue),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(subtitle),
+      ),
+    );
+  }
+
+  Widget _buildDateTimeTile(String formattedDate) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ListTile(
+        title: const Text('Pickup Date & Time'),
+        subtitle: Text(formattedDate),
+        trailing: const Icon(Icons.calendar_today),
+        onTap: _pickDateTime,
       ),
     );
   }

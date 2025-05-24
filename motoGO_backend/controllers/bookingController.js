@@ -66,3 +66,14 @@ exports.getBookingsByUser = async (req, res) => {
     res.status(500).json({ error: 'Database error' });
   }
 };
+// In bookingController.js
+exports.cancelBooking = async (req, res) => {
+  const bookingId = req.params.id;
+  try {
+    await db.query('DELETE FROM bookings WHERE id = ?', [bookingId]);
+    res.status(200).json({ message: 'Booking cancelled successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to cancel booking' });
+  }
+};
+
