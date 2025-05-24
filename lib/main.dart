@@ -4,7 +4,7 @@ import 'package:moto_go/providers/user_provider.dart'; // <-- Import PaymentProv
 import 'Screens/login_screen.dart';
 import 'package:moto_go/providers/bike_provider.dart';
 import 'package:moto_go/providers/booking_provider.dart';
-
+import 'package:moto_go/Screens/home_screen.dart';
 
 void main() {
   runApp(

@@ -127,88 +127,106 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Padding(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: firstNameController,
-                decoration: const InputDecoration(
-                  labelText: 'First Name',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (val) => val == null || val.isEmpty ? 'Enter first name' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: middleNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Middle Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: lastNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Last Name',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (val) => val == null || val.isEmpty ? 'Enter last name' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-                validator: _validateEmail,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.phone,
-                validator: (val) => val == null || val.isEmpty ? 'Enter phone number' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: dobController,
-                decoration: const InputDecoration(
-                  labelText: 'Birthdate (YYYY-MM-DD)',
-                  border: OutlineInputBorder(),
-                ),
-                validator: _validateDate,
-                keyboardType: TextInputType.datetime,
-              ),
-              const SizedBox(height: 20),
-              if (_errorMessage != null) ...[
-                Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-                const SizedBox(height: 12),
-              ],
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () => updateProfile(username),
-                child: const Text(
-                  'Update Profile',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
             ],
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                TextFormField(
+                  controller: firstNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'First Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (val) =>
+                  val == null || val.isEmpty ? 'Enter first name' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: middleNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Middle Name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: lastNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Last Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (val) =>
+                  val == null || val.isEmpty ? 'Enter last name' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateEmail,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: phoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.phone,
+                  validator: (val) =>
+                  val == null || val.isEmpty ? 'Enter phone number' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: dobController,
+                  decoration: const InputDecoration(
+                    labelText: 'Birthdate (YYYY-MM-DD)',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateDate,
+                  keyboardType: TextInputType.datetime,
+                ),
+                const SizedBox(height: 20),
+                if (_errorMessage != null) ...[
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () => updateProfile(username),
+                  child: const Text(
+                    'Update Profile',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

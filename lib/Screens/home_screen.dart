@@ -13,7 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:moto_go/Search/BikeSearchScreen.dart';
 import 'package:moto_go/Screens/login_screen.dart'; // <-- Import LoginScreen
 import 'package:moto_go/Screens/my_booking_screen.dart';
-
+import 'package:moto_go/Screens/ride_history_screen.dart';
+import 'package:moto_go/providers/user_provider.dart';
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
 
@@ -63,24 +64,24 @@ class _HomescreenState extends State<Homescreen> {
     setState(() => _selectedIndex = index);
 
     if (index == 1) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Ride History'),
-          content: const Text('No Ride History yet'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 0;
-                });
-              },
-              child: const Text('OK'),
+      final userProvider = context.read<UserProvider>();
+      final userIdString = userProvider.userId;
+
+      if (userIdString != null) {
+        final userId = int.tryParse(userIdString);
+        if (userId != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => RideHistoryScreen(userId: userId),
             ),
-          ],
-        ),
-      );
+          );
+        } else {
+          print('Invalid user ID format');
+        }
+      } else {
+        print('User is not logged in');
+      }
     }
   }
 

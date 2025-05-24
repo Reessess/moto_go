@@ -106,210 +106,297 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
-          child: FadeTransition(
-            opacity: _fadeInAnimation,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Admin login button on top right
-                Align(
-                  alignment: Alignment.topRight,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade700,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      elevation: 6,
-                      shadowColor: Colors.orangeAccent,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>  AdminLoginScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Admin Login',
-                      style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Logo with shadow
-                CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Colors.white,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 12,
-                          spreadRadius: 1,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                      image: const DecorationImage(
-                        image: AssetImage('assets/Icon.PNG'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 38),
-                // Title text
-                Text(
-                  'Log in to continue your journey with motoGO',
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: Colors.brown.shade700,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.8,
-                    height: 1.3,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 36),
-                // Form container
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF6E9D6),
-                    borderRadius: BorderRadius.circular(36),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.brown.shade200.withOpacity(0.3),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: usernameController,
-                        decoration: InputDecoration(
-                          labelText: 'Username',
-                          labelStyle: TextStyle(color: Colors.brown.shade400),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide.none,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ClipPath(
+                      clipper: TopMapShapeClipper(),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFFDEEAFD), Color(0xFFCAD8F7)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        controller: passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          labelStyle: TextStyle(color: Colors.brown.shade400),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                          border: OutlineInputBorder(
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: 200,
+              left: -100,
+              child: ClipPath(
+                clipper: BottomMapShapeClipper(),
+                child: Container(
+                  width: 400,
+                  height: 300,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFFFDEBD2), Color(0xFFF9D3B4)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
+              child: FadeTransition(
+                opacity: _fadeInAnimation,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange.shade700,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide.none,
+                          ),
+                          elevation: 6,
+                          shadowColor: Colors.orangeAccent,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AdminLoginScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Admin Login',
+                          style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.white,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.15),
+                              blurRadius: 12,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                          image: const DecorationImage(
+                            image: AssetImage('assets/Icon.PNG'),
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            // Forgot password handler
-                          },
-                          child: Text(
-                            'Forgot password? Contact Admin',
-                            style: TextStyle(
-                              color: Colors.brown.shade600,
-                              fontWeight: FontWeight.w600,
+                    ),
+                    const SizedBox(height: 38),
+                    Text(
+                      'Log in to continue your journey with motoGO',
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: Colors.brown.shade700,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.8,
+                        height: 1.3,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 36),
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF6E9D6),
+                        borderRadius: BorderRadius.circular(36),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.brown.shade200.withOpacity(0.3),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: usernameController,
+                            decoration: InputDecoration(
+                              labelText: 'Username',
+                              labelStyle: TextStyle(color: Colors.brown.shade400),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          TextField(
+                            controller: passwordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              labelStyle: TextStyle(color: Colors.brown.shade400),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {},
+                              child: Text(
+                                'Forgot password? Contact Admin',
+                                style: TextStyle(
+                                  color: Colors.brown.shade600,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 8,
+                          shadowColor: Colors.deepPurpleAccent.withOpacity(0.5),
+                          backgroundColor: Colors.transparent,
+                        ),
+                        onPressed: _login,
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF1D2D69), Color(0xFF4A57A3)],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 50,
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 40),
-                // Login button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      elevation: 8,
-                      shadowColor: Colors.deepPurpleAccent.withOpacity(0.5),
-                      backgroundColor: Colors.transparent,
                     ),
-                    onPressed: _login,
-                    child: Ink(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1D2D69), Color(0xFF4A57A3)],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2B3B27),
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 5,
+                          shadowColor: Colors.black45,
                         ),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: 50,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegistrationWidget(),
+                            ),
+                          );
+                        },
                         child: const Text(
-                          'Login',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                          'Sign up',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                // Sign up button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2B3B27),
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      elevation: 5,
-                      shadowColor: Colors.black45,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegistrationWidget(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Sign up',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
+}
+
+class TopMapShapeClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.lineTo(0, size.height * 0.8);
+    path.quadraticBezierTo(
+      size.width * 0.25,
+      size.height,
+      size.width * 0.5,
+      size.height * 0.8,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.75,
+      size.height * 0.6,
+      size.width,
+      size.height * 0.8,
+    );
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+class BottomMapShapeClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.moveTo(0, size.height * 0.4);
+    path.quadraticBezierTo(
+      size.width * 0.3,
+      size.height * 0.1,
+      size.width * 0.6,
+      size.height * 0.4,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.9,
+      size.height * 0.7,
+      size.width,
+      size.height * 0.4,
+    );
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
