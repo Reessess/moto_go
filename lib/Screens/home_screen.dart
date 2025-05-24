@@ -383,27 +383,27 @@ class _HomescreenState extends State<Homescreen> {
   }
 
   Widget _buildTopPickCard(BuildContext context, Bikes bike) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => BikeDetailsScreen(bike: bike)),
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
-          boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
-          ],
-        ),
-        child: Row(
-          children: [
-            Hero(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+        ],
+      ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              // Navigate to BikeDetailsScreen when image or left side tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => BikeDetailsScreen(bike: bike)),
+              );
+            },
+            child: Hero(
               tag: 'bikeImage_${bike.id}',
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
@@ -417,28 +417,51 @@ class _HomescreenState extends State<Homescreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(bike.brand,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 6),
-                  Text(bike.model,
-                      style: const TextStyle(fontSize: 16, color: Colors.grey)),
-                  const SizedBox(height: 6),
-                  Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour',
-                      style: const TextStyle(fontSize: 16, color: Colors.orange)),
-                ],
-              ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(bike.brand,
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                Text(bike.model,
+                    style: const TextStyle(fontSize: 16, color: Colors.grey)),
+                const SizedBox(height: 6),
+                Text('\$${bike.pricePerHour.toStringAsFixed(2)}/hour',
+                    style: const TextStyle(fontSize: 16, color: Colors.orange)),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to BookingScreen with bike details
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BookingScreen(selectedBike: bike),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: const Text('Book Now', style: TextStyle(fontSize: 18)),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
 
   void _showLogoutConfirmationDialog(BuildContext context) {
     showDialog(
