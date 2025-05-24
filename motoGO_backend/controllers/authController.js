@@ -244,18 +244,18 @@ exports.updateProfile = async (req, res) => {
   }
 };
 exports.addBike = async (req, res) => {
-  const { model, brand, description, price_per_day, image_url } = req.body;
+  const { model, brand, description, pricePerHour, image_url } = req.body;
 
-  if (!model || !brand || !price_per_day) {
+  if (!model || !brand || !pricePerHour) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
   try {
     const sql = `
-      INSERT INTO bikes (model, brand, description, price_per_day, image_url)
+      INSERT INTO bikes (model, brand, description, pricePerHour, image_url)
       VALUES (?, ?, ?, ?, ?)
     `;
-    await db.query(sql, [model, brand, description, price_per_day, image_url]);
+    await db.query(sql, [model, brand, description, pricePerHour, image_url]);
 
     res.status(201).json({ message: 'Bike added successfully' });
   } catch (error) {

@@ -12,6 +12,7 @@ import 'package:moto_go/providers/bike_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:moto_go/Search/BikeSearchScreen.dart';
 import 'package:moto_go/Screens/login_screen.dart'; // <-- Import LoginScreen
+import 'package:moto_go/Screens/my_booking_screen.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -170,7 +171,11 @@ class _HomescreenState extends State<Homescreen> {
                 child: ListTile(
                   leading: const Icon(Icons.book_online),
                   title: const Text('My Bookings'),
-                  onTap: () {},
+                  onTap: () { Navigator.pop(context);  // Close drawer first
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
+                  );},
                 ),
               ),
               _buildMenuTile(

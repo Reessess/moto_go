@@ -19,7 +19,6 @@ class BookingScreen extends StatefulWidget {
 class _BookingScreenState extends State<BookingScreen> {
   DateTime? _pickupDateTime;
   final TextEditingController _hoursController = TextEditingController();
-  bool _isSubmitting = false;
 
   void _pickDateTime() async {
     final date = await showDatePicker(
@@ -54,7 +53,7 @@ class _BookingScreenState extends State<BookingScreen> {
 
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User is not logged in')),
+        const SnackBar(content: Text('User  is not logged in')),
       );
       return;
     }
@@ -84,8 +83,6 @@ class _BookingScreenState extends State<BookingScreen> {
       "total_cost": totalCost,
     };
 
-    setState(() => _isSubmitting = true);
-
     try {
       final response = await http.post(
         Uri.parse('http://192.168.5.129:3000/api/bookings'),
@@ -109,8 +106,6 @@ class _BookingScreenState extends State<BookingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
-    } finally {
-      setState(() => _isSubmitting = false); // Always reset
     }
   }
 
@@ -136,7 +131,7 @@ class _BookingScreenState extends State<BookingScreen> {
     final int hours = int.tryParse(_hoursController.text) ?? 0;
     final double totalCost = hours * pricePerHour;
 
-    bool canSubmit = _pickupDateTime != null && hours > 0 && !_isSubmitting;
+    bool canSubmit = _pickupDateTime != null && hours > 0;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Book a Bike')),
@@ -191,13 +186,7 @@ class _BookingScreenState extends State<BookingScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: canSubmit ? _submitBooking : null,
-                child: _isSubmitting
-                    ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                )
-                    : const Text('Confirm Booking'),
+                child: const Text('Confirm Booking'),
               ),
             ),
           ],
