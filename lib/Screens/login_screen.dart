@@ -7,6 +7,7 @@ import 'package:moto_go/providers/user_provider.dart';
 import 'home_screen.dart';
 import 'admin_login_screen.dart';
 import 'registration_screen.dart';
+import 'package:moto_go/Screens/forgot_password.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,6 +19,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   late AnimationController _animationController;
   late Animation<double> _fadeInAnimation;
 
@@ -28,10 +30,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    _fadeInAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    );
+    _fadeInAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeIn);
     _animationController.forward();
   }
 
@@ -41,24 +40,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     passwordController.dispose();
     _animationController.dispose();
     super.dispose();
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Login Failed'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> _login() async {
@@ -76,10 +57,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'username': username,
-          'password': password,
-        }),
+        body: jsonEncode({'username': username, 'password': password}),
       );
 
       final data = jsonDecode(response.body);
@@ -87,7 +65,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       if (response.statusCode == 200 && data['success'] == true) {
         final user = data['user'];
         Provider.of<UserProvider>(context, listen: false).setUserData(user);
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const Homescreen()),
@@ -100,9 +77,24 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     }
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Login Failed'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -168,9 +160,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => AdminLoginScreen(),
-                            ),
+                            MaterialPageRoute(builder: (context) => AdminLoginScreen()),
                           );
                         },
                         child: const Text(
@@ -263,7 +253,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                                );
+                              },
                               child: Text(
                                 'Forgot password? Contact Admin',
                                 style: TextStyle(
@@ -326,9 +321,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => const RegistrationWidget(),
-                            ),
+                            MaterialPageRoute(builder: (context) => const RegistrationWidget()),
                           );
                         },
                         child: const Text(
@@ -378,21 +371,22 @@ class BottomMapShapeClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
-    path.moveTo(0, size.height * 0.4);
+    path.moveTo(0, size.height * 0.2);
     path.quadraticBezierTo(
-      size.width * 0.3,
-      size.height * 0.1,
-      size.width * 0.6,
+      size.width * 0.25,
       size.height * 0.4,
+      size.width * 0.5,
+      size.height * 0.3,
     );
     path.quadraticBezierTo(
-      size.width * 0.9,
-      size.height * 0.7,
+      size.width * 0.75,
+      size.height * 0.15,
       size.width,
-      size.height * 0.4,
+      size.height * 0.3,
     );
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
+    path.lineTo(size.width, 0);
+
+    path.lineTo(0, 0);
     path.close();
     return path;
   }

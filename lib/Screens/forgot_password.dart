@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:moto_go/providers/user_provider.dart';
+import 'package:provider/provider.dart';
+
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -15,6 +19,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController repeatPasswordController = TextEditingController();
 
   bool _isLoading = false;
 
@@ -23,6 +29,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     usernameController.dispose();
     emailController.dispose();
     phoneController.dispose();
+    newPasswordController.dispose();
+    repeatPasswordController.dispose();
     super.dispose();
   }
 
@@ -52,29 +60,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final username = usernameController.text.trim();
     final email = emailController.text.trim();
     final phone = phoneController.text.trim();
+    final newPassword = newPasswordController.text.trim();
+
+    final userProv = Provider.of<UserProvider>(context, listen: false);
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final url = Uri.parse('http://192.168.5.129:3000/api/auth/forgot-password');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'username': username,
-          'email': email,
-          'phone': phone,
-        }),
+      // Call your userProvider method — adjust the method name as per your implementation
+      final result = await userProv.resetPassword(
+        username: username,
+        email: email,
+        phone: phone,
+        newPassword: newPassword,
       );
 
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 && data['success'] == true) {
-        _showDialog('Success', data['message'] ?? 'Password reset instructions sent to your email/phone.');
+      if (result['success']) {
+        _showDialog('Success', result['message']);
       } else {
-        _showDialog('Failed', data['message'] ?? 'Unable to process your request.');
+        _showDialog('Failed', result['message']);
       }
     } catch (e) {
       _showDialog('Error', 'An error occurred. Please try again later.');
@@ -84,6 +90,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       });
     }
   }
+
 
   String? _validateUsername(String? value) {
     if (value == null || value.trim().isEmpty) {
@@ -114,21 +121,42 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return null;
   }
 
+  String? _validateNewPassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter a new password.';
+    }
+    if (value.trim().length < 6) {
+      return 'Password must be at least 6 characters.';
+    }
+    return null;
+  }
+
+  String? _validateRepeatPassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please re-enter your new password.';
+    }
+    if (value.trim() != newPasswordController.text.trim()) {
+      return 'Passwords do not match.';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Forgot Password'),
+        title: const Text('Reset Password'),
         backgroundColor: const Color(0xFF1D2D69),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
-          child: Column(
+          child: ListView(
+            // Changed from Column to ListView for better scrolling on smaller devices
             children: [
               Text(
-                'Enter your username, email, and phone number to reset your password.',
+                'Enter your username, email, and phone number to verify your account, then set a new password.',
                 style: TextStyle(fontSize: 16, color: Colors.brown.shade700),
               ),
               const SizedBox(height: 24),
@@ -160,9 +188,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 validator: _validatePhone,
               ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: newPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'New Password',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                ),
+                validator: _validateNewPassword,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: repeatPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Repeat New Password',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                ),
+                validator: _validateRepeatPassword,
+              ),
               const SizedBox(height: 32),
               _isLoading
-                  ? const CircularProgressIndicator()
+                  ? const Center(child: CircularProgressIndicator())
                   : SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -173,7 +221,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   onPressed: _submitForgotPassword,
                   child: const Text(
-                    'Submit',
+                    'Reset Password',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),

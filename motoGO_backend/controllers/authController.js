@@ -243,23 +243,39 @@ exports.updateProfile = async (req, res) => {
     });
   }
 };
-exports.addBike = async (req, res) => {
-  const { model, brand, description, pricePerHour, image_url } = req.body;
+exports.resetPasswordHandler = async (req, res) => {
+  const { username, email, phone, newPassword } = req.body;
 
-  if (!model || !brand || !pricePerHour) {
-    return res.status(400).json({ message: 'Missing required fields' });
+  if (!username || !email || !phone || !newPassword) {
+    return res.status(400).json({ success: false, message: 'Missing required fields.' });
   }
 
   try {
-    const sql = `
-      INSERT INTO bikes (model, brand, description, pricePerHour, image_url)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    await db.query(sql, [model, brand, description, pricePerHour, image_url]);
+    console.log('Incoming reset request:', { username, email, phone, newPassword });
 
-    res.status(201).json({ message: 'Bike added successfully' });
+    const [users] = await db.query(
+      'SELECT * FROM users WHERE username = ? AND email = ? AND phone = ?',
+      [username, email, phone]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found or credentials mismatch.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const [result] = await db.query(
+      'UPDATE users SET password = ? WHERE username = ?',
+      [hashedPassword, username]
+    );
+
+    console.log('Update result:', result);
+
+    return res.status(200).json({ success: true, message: 'Password reset successfully.' });
   } catch (error) {
-    console.error('Error adding bike:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Reset password error:', error); // <-- this will show the real reason
+    return res.status(500).json({ success: false, message: 'Server error while resetting password.' });
   }
 };
+
+

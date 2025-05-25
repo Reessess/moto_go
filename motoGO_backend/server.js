@@ -23,6 +23,9 @@ app.use('/api/bookings', bookingRoutes);
 // Use payment routes
 app.use('/api/payments', paymentRoutes);
 
+app.use('/api/auth', require('./routes/authRoutes'));
+
+
 // DB connection test
 app.get('/test-db', async (req, res) => {
   try {
