@@ -260,7 +260,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 );
                               },
                               child: Text(
-                                'Forgot password? Contact Admin',
+                                'Forgot password?',
                                 style: TextStyle(
                                   color: Colors.brown.shade600,
                                   fontWeight: FontWeight.w600,

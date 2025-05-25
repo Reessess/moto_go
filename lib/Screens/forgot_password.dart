@@ -1,10 +1,29 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:moto_go/providers/user_provider.dart';
-import 'package:provider/provider.dart';
 
+// Custom Clipper for Abstract Background
+class AbstractMapClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.lineTo(0, size.height * 0.35);
+    path.quadraticBezierTo(
+      size.width * 0.3, size.height * 0.45,
+      size.width * 0.5, size.height * 0.3,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.8, size.height * 0.05,
+      size.width, size.height * 0.2,
+    );
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -42,13 +61,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         content: Text(message),
         actions: [
           TextButton(
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                if (title == "Success") {
-                  Navigator.of(context).pop(); // go back on success
-                }
-              },
-              child: const Text("OK")),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              if (title == "Success") {
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text("OK"),
+          ),
         ],
       ),
     );
@@ -57,11 +77,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _submitForgotPassword() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final username = usernameController.text.trim();
-    final email = emailController.text.trim();
-    final phone = phoneController.text.trim();
-    final newPassword = newPasswordController.text.trim();
-
     final userProv = Provider.of<UserProvider>(context, listen: false);
 
     setState(() {
@@ -69,12 +84,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     });
 
     try {
-      // Call your userProvider method — adjust the method name as per your implementation
       final result = await userProv.resetPassword(
-        username: username,
-        email: email,
-        phone: phone,
-        newPassword: newPassword,
+        username: usernameController.text.trim(),
+        email: emailController.text.trim(),
+        phone: phoneController.text.trim(),
+        newPassword: newPasswordController.text.trim(),
       );
 
       if (result['success']) {
@@ -91,143 +105,182 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
   }
 
-
-  String? _validateUsername(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please enter your username.';
-    }
-    return null;
-  }
+  String? _validateUsername(String? value) =>
+      value == null || value.trim().isEmpty ? 'Enter your username.' : null;
 
   String? _validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please enter your email.';
-    }
+    if (value == null || value.trim().isEmpty) return 'Enter your email.';
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(value.trim())) {
-      return 'Please enter a valid email address.';
-    }
-    return null;
+    return !emailRegex.hasMatch(value.trim()) ? 'Enter a valid email.' : null;
   }
 
   String? _validatePhone(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please enter your phone number.';
-    }
+    if (value == null || value.trim().isEmpty) return 'Enter your phone number.';
     final phoneRegex = RegExp(r'^\+?[0-9]{7,15}$');
-    if (!phoneRegex.hasMatch(value.trim())) {
-      return 'Please enter a valid phone number.';
-    }
-    return null;
+    return !phoneRegex.hasMatch(value.trim()) ? 'Enter a valid phone number.' : null;
   }
 
   String? _validateNewPassword(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please enter a new password.';
-    }
-    if (value.trim().length < 6) {
-      return 'Password must be at least 6 characters.';
-    }
-    return null;
+    if (value == null || value.trim().isEmpty) return 'Enter a new password.';
+    return value.trim().length < 6 ? 'Password must be at least 6 characters.' : null;
   }
 
-  String? _validateRepeatPassword(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please re-enter your new password.';
-    }
-    if (value.trim() != newPasswordController.text.trim()) {
-      return 'Passwords do not match.';
-    }
-    return null;
-  }
+  String? _validateRepeatPassword(String? value) =>
+      value != newPasswordController.text.trim() ? 'Passwords do not match.' : null;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reset Password'),
-        backgroundColor: const Color(0xFF1D2D69),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            // Changed from Column to ListView for better scrolling on smaller devices
-            children: [
-              Text(
-                'Enter your username, email, and phone number to verify your account, then set a new password.',
-                style: TextStyle(fontSize: 16, color: Colors.brown.shade700),
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: usernameController,
-                decoration: InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                validator: _validateUsername,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                validator: _validateEmail,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                validator: _validatePhone,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: newPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'New Password',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                validator: _validateNewPassword,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: repeatPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Repeat New Password',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                validator: _validateRepeatPassword,
-              ),
-              const SizedBox(height: 32),
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1D2D69),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  ),
-                  onPressed: _submitForgotPassword,
-                  child: const Text(
-                    'Reset Password',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+      body: Stack(
+        children: [
+          ClipPath(
+            clipper: AbstractMapClipper(),
+            child: Container(
+              height: 300,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFF6E9D6), Color(0xFFF9D3B4)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
-            ],
+            ),
           ),
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  const SizedBox(height: 30),
+                  Image.asset('assets/Icon.PNG', height: 100),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF9D3B4), // Updated card color
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          const Text(
+                            'Reset Your Password',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1D2D69),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          _buildTextField(
+                            controller: usernameController,
+                            label: 'Username',
+                            icon: Icons.person,
+                            validator: _validateUsername,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: emailController,
+                            label: 'Email',
+                            icon: Icons.email,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: _validateEmail,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: phoneController,
+                            label: 'Phone Number',
+                            icon: Icons.phone,
+                            keyboardType: TextInputType.phone,
+                            validator: _validatePhone,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: newPasswordController,
+                            label: 'New Password',
+                            icon: Icons.lock,
+                            obscureText: true,
+                            validator: _validateNewPassword,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: repeatPasswordController,
+                            label: 'Repeat New Password',
+                            icon: Icons.lock_outline,
+                            obscureText: true,
+                            validator: _validateRepeatPassword,
+                          ),
+                          const SizedBox(height: 30),
+                          _isLoading
+                              ? const CircularProgressIndicator()
+                              : SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1D2D69),
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: _submitForgotPassword,
+                              child: const Text(
+                                'Reset Password',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+    bool obscureText = false,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      validator: validator,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon, color: const Color(0xFF1D2D69)),
+        labelText: label,
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.transparent),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF1D2D69), width: 2),
         ),
       ),
     );
