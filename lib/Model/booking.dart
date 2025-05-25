@@ -8,7 +8,7 @@ class Booking {
   final String bikeBrand;
   final String bikeModel;
   final double pricePerHour;
-  final String status;  // <-- added status here
+  final String status;
 
   Booking({
     required this.id,
@@ -20,7 +20,7 @@ class Booking {
     required this.bikeBrand,
     required this.bikeModel,
     required this.pricePerHour,
-    required this.status,  // <-- add status in constructor
+    required this.status,
   });
 
   factory Booking.fromJson(Map<String, dynamic> json) {

@@ -3,6 +3,9 @@ import 'package:moto_go/Model/booking.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
+import  'package:moto_go/providers/booking_provider.dart';
+import 'package:moto_go/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class PaymentScreen extends StatefulWidget {
   final Booking booking;
@@ -61,11 +64,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
         body: jsonEncode(payload),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Payment successful!')),
+          const SnackBar(content: Text('Payment Successful!')),
         );
-        Navigator.pop(context);
+
+        final bookingProvider = Provider.of<BookingProvider>(context, listen: false);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        final userId = int.tryParse(userProvider.userId ?? '');
+        if (userId != null) {
+          await bookingProvider.fetchBookings(userId);
+        }
+
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Payment failed: ${response.body}')),
