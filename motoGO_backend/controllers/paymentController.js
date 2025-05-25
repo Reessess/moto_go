@@ -72,4 +72,3 @@ const getPaymentById = async (req, res) => {
 };
 
 module.exports = { createPayment, getAllPayments, getPaymentById };
-
